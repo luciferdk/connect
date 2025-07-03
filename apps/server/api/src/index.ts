@@ -6,9 +6,9 @@ dotenv.config();
 //  --now no one care thse se line where imported
 import express from 'express';
 import cors from 'cors';
+import { messages } from './routes/routesMessages';
 import authRoutes from './routes/routesAuth';
 import cookieParser from 'cookie-parser';
-
 
 
 const server  = express();
@@ -18,7 +18,8 @@ server.use(cors());
 server.use(express.json());
 server.use(cookieParser());
 
-server.use('/api', authRoutes);
+server.use('/api/auth', authRoutes);
+server.use('/api/messages', messagesRoutes);
 
 
 // Start server
