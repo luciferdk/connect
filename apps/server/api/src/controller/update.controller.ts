@@ -1,24 +1,29 @@
 import { Request, Response } from 'express';
-import { cloudinary } from '../config/cloudinary';
+import cloudinary from '../config/cloudinary';
+import { PrismaClient } from '../generated/prisma';
+
+const prisma = new PrismaClient();
 
 
+export const updateBro = async (req: Request, res: Response) => {
+  try {
+    const { profilePic } = req.body;
+    const userId = (req as any).user.id;
 
-export const updateBro = async(req:Request, res:Response) => {
-try {
-	const {profilePic} = req.body;
-	const userId = req.user._id;
+    if (!profilePic) {
+      return res.status(400).json({ message: 'Profile pic is required' });
+    }
 
-if(!profilePic){
-	res.status(400).json({ message: 'Profile pic is required'});
-	}
-const uploadResponse = await cloudinary.uploder.upload(profilePic);
+    const uploadResponse = await cloudinary.uploader.upload(profilePic);
 
-const updatedUser = await user.findByIdAndUpdate(userId, {profilePic:uploadRespponse.secure_url},{new:true});
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { profileUrl: uploadResponse.secure_url },
+    });
 
-res.status(200).json(updatedUser);
-
-} catch (error) {
-	console.log(error);
-	res.status(500).json({message: 'internal server error'});
-	}
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'internal server error' });
+  }
 };

@@ -1,12 +1,18 @@
 import express from 'express';
 import { protectRoute } from '../middleware/auth.middleware';
-import { getMessages, getUsersForSideBar } from '../controller/message.controller';
+import {
+  getMessages,
+  getUsersForSideBar,
+  sendMessage,
+} from '../controller/message.controller';
 
-const routes = express.Router();
+const router = express.Router();
 
-router.get('/users', protectRoute, getUserSideBar);
+// @ts-ignore - Temporarily ignore TypeScript errors for async handlers
+router.get('/users', protectRoute, getUsersForSideBar);
+// @ts-ignore - Temporarily ignore TypeScript errors for async handlers
 router.get('/:id', protectRoute, getMessages);
-
+// @ts-ignore - Temporarily ignore TypeScript errors for async handlers
 router.post('/send/:id', protectRoute, sendMessage);
 
-export defult router;
+export default router;

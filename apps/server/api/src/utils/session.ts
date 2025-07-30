@@ -13,7 +13,7 @@ interface UserSession {
 }
 
 //Generate session token (e.g., JWT)
-export const generatedToken = (userId:UserSession, res:Response) => {
+export const generateToken = (user:UserSession, res:Response) => {
   
   // Ensure JWT_SECRET is defined in your environment variables
   if (!process.env.JWT_SECRET) {

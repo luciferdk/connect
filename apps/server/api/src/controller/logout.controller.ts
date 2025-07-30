@@ -4,7 +4,7 @@ import { degradeToken } from '../utils/session';
 
 export const logout = async (res: Response) => {
   try {
-	  await degradeToken(res);
+    await degradeToken(res);
     res.status(200).json({ message: 'You are logged out successfully' });
   } catch (error) {
     console.error('Logout error: ', error);

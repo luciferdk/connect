@@ -3,25 +3,24 @@ import { generateToken } from '../utils/session';
 import { sendOtp } from '../config/sendOtp';
 import { redisClient } from '../config/redis';
 import { PrismaClient } from '../generated/prisma';
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
 const prisma = new PrismaClient();
 
 // This interface now reflects the expected shape of req.body
-interface UserData {
+interface UserSession {
   mobile: string;
   name: string;
-  bio?: string;
-  profileUrl?: string; // Corrected: profileImg -> profileUrl
+  bio?: string | null;
+  profileUrl?: string | null; // Corrected: profileImg -> profileUrl
   otp?: number; // Corrected: int -> number
 }
 
 // Corrected function signature for an Express route handler
 export const authentic = async (req: Request, res: Response) => {
   //Destructure properties directly from req.body, and ensure correct field names
-  const { mobile, otp, name, bio, profileUrl } = req.body as UserData; // Cast req.body to UserData for type safety
+  const { mobile, otp, name, bio, profileUrl } = req.body as UserSession; // Cast req.body to UserData for type safety
 
   if (!otp) {
     // Basic validation for required fields
@@ -66,7 +65,8 @@ export const authentic = async (req: Request, res: Response) => {
       }
 
       //write a default url with dummy image
-      const finalProfileUrl = profileUrl ?? 'https://example.com/default-profile.png'; //or any other default URL
+      const finalProfileUrl =
+        profileUrl ?? 'https://example.com/default-profile.png'; //or any other default URL
 
       user = await prisma.user.create({
         data: {
@@ -78,8 +78,18 @@ export const authentic = async (req: Request, res: Response) => {
       });
     }
 
-    await generateToken(user,res);
-   
+  
+await generateToken(
+  {
+    id: user.id,
+    name: user.name,
+    mobile: user.mobile,
+    bio: user.bio ?? undefined, // convert null to undefined
+    profileUrl: user.profileUrl ?? undefined, // convert null to undefined
+  },
+  res
+);
+
     // Delete OTP from redis after successful authentication
     await redisClient.del(`otp:${mobile}`);
   } catch (err) {
@@ -87,4 +97,3 @@ export const authentic = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
-
