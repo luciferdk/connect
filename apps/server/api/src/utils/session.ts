@@ -26,7 +26,7 @@ try {
     });
     //set the cookie securely
     res.cookie('jwt', token, {
-      sameSite: 'strict', //CSRF Protacton
+      //sameSite: 'strict', //CSRF Protacton
       maxAge: 7 * 60 * 60 * 1000,
     });
 

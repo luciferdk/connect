@@ -1,5 +1,5 @@
 'use client';
-
+import axios from 'axios';
 import { useState } from 'react';
 
 export default function HomePage() {
@@ -20,23 +20,10 @@ export default function HomePage() {
 
     try {
       // Send phone number to backend
-      const response = await fetch('http://localhost:8080/api/auth/authentication', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mobile }),
-      });
-//http://localhost:8080/api/auth/authentication
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('OTP sent successfully!');
-        setStep(2);
-      } else {
-        setMessage(data.message || 'Failed to send OTP');
-      }
-    } catch (error) {
+      const { data } = await axios.post('http://localhost:8080/api/auth/authentication',{ mobile });
+      setMessage('OTP sent successfully!');
+      setStep(2);
+    } catch (error: any) {
       setMessage('Error sending OTP. Please try again.');
     } finally {
       setLoading(false);
@@ -54,23 +41,13 @@ export default function HomePage() {
 
     try {
       // Send phone number and OTP to backend
-      const response = await fetch('/api/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mobile, otp }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('OTP verified successfully!');
-        // You can redirect or update UI state here
-      } else {
-        setMessage(data.message || 'Invalid OTP');
-      }
-    } catch (error) {
+      const {data} = await axios.post('http://localhost:8080/api/auth/authentication', {mobile, otp });
+      
+setMessage('OTP Verified Successfully!');
+//redirect or do otheraciton hear
+// You can redirect or update UI state here
+    } catch (error:any) {
+    console.error(error,'otp varification issue');
       setMessage('Error verifying OTP. Please try again.');
     } finally {
       setLoading(false);
@@ -92,7 +69,9 @@ export default function HomePage() {
             Phone Verification
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            {step === 1 ? 'Enter your phone number' : 'Enter the OTP sent to your phone'}
+            {step === 1
+              ? 'Enter your phone number'
+              : 'Enter the OTP sent to your phone'}
           </p>
         </div>
 
@@ -101,7 +80,10 @@ export default function HomePage() {
             // Step 1: Phone Number Input
             <div className="space-y-4">
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Phone Number
                 </label>
                 <input
@@ -131,10 +113,15 @@ export default function HomePage() {
             // Step 2: OTP Input
             <div className="space-y-4">
               <div>
-                <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="otp"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Enter OTP
                 </label>
-                <p className="text-xs text-gray-500 mb-2">Sent to: +91{phoneNumber}</p>
+                <p className="text-xs text-gray-500 mb-2">
+                  Sent to: +91{mobile}
+                </p>
                 <input
                   id="otp"
                   type="text"
@@ -164,12 +151,13 @@ export default function HomePage() {
           )}
 
           {message && (
-            <div className={`p-3 rounded-md ${
-                message.includes('successfully') 
-                  ? 'bg-green-100 text-green-700' 
+            <div
+              className={`p-3 rounded-md ${
+                message.includes('successfully')
+                  ? 'bg-green-100 text-green-700'
                   : 'bg-red-100 text-red-700'
-              }`
-            }>
+              }`}
+            >
               {message}
             </div>
           )}
