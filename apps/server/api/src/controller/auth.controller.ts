@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { generateToken } from '../utils/session';
+import { generateToken, degradeToken } from '../utils/session';
 import { sendOtp } from '../config/sendOtp';
 import { redisClient } from '../config/redis';
 import { PrismaClient } from '../generated/prisma';
@@ -55,45 +55,44 @@ export const authentic = async (req: Request, res: Response) => {
 
     // if not present then create one
     if (!user) {
-      // Ensure all required fields for user creation are present or handle appropriately
-      if (!name) {
-        // Name is required in your Prisma schema (String, not String?)
-        res
-          .status(400)
-          .json({ error: 'Name is required for new user registration.' });
-        return;
+      try {
+        //write a default url with dummy image
+        const finalProfileUrl =
+          profileUrl ?? 'https://example.com/default-profile.png'; //or any other default URL
+        const justName = name ?? 'dhrup';
+        user = await prisma.user.create({
+          data: {
+            mobile,
+            name: justName,
+            bio,
+            profileUrl: finalProfileUrl,
+          },
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Unable to create user in Database' });
+	return;
       }
-
-      //write a default url with dummy image
-      const finalProfileUrl =
-        profileUrl ?? 'https://example.com/default-profile.png'; //or any other default URL
-
-      user = await prisma.user.create({
-        data: {
-          mobile,
-          name,
-          bio,
-          profileUrl: finalProfileUrl,
-        },
-      });
     }
 
-  
-await generateToken(
-  {
-    id: user.id,
-    name: user.name,
-    mobile: user.mobile,
-    bio: user.bio ?? undefined, // convert null to undefined
-    profileUrl: user.profileUrl ?? undefined, // convert null to undefined
-  },
-  res
-);
+    await generateToken(user, res);
 
     // Delete OTP from redis after successful authentication
     await redisClient.del(`otp:${mobile}`);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+// logout.controller.ts
+export const logout = async (res: Response) => {
+  try {
+    await degradeToken(res);
+    res.status(200).json({ message: 'You are logged out successfully' });
+  } catch (error) {
+    console.error('Logout error: ', error);
+    res.status(500).json({ message: 'internal server error' });
   }
 };

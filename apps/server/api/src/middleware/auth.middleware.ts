@@ -7,50 +7,73 @@ import { PrismaClient } from '../generated/prisma';
 
 const prisma = new PrismaClient();
 
-//Extend Request interface to include user property to prevent type error
+// ✅ Updated CustomRequest: no `null`, only `undefined` or a valid user object
+interface CustomRequest extends Request {
+  user?: {
+    id: number;
+    name: string;
+    mobile: string;
+    bio: string | null;
+    profileUrl: string | null;
+  };
+}
 
+// ✅ Middleware to protect routes
 export const protectRoute = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    //get token from cookies
     const token = req.cookies.jwt;
 
     if (!token) {
-      res.status(401).json({ message: 'Not authorize: No Token found' });
+      res.status(401).json({ message: 'Not authorized: No Token found' });
+      return;
     }
-    //get token from .env file
+
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is missing in environment');
     }
 
-    //verify both token are match or not
     const decode: any = jwt.verify(token, process.env.JWT_SECRET);
 
-    // find user by ID from token payload
-
-    let user = await prisma.user.findUnique({
-      where: { id: decode.userId }, // use userId from token
+    const user = await prisma.user.findUnique({
+      where: { id: decode.userId },
     });
 
     if (!user) {
-       res.status(401).json({ message: 'User not found' });
+      res.status(401).json({ message: 'User not found' });
+      return;
     }
 
-    //attach user to request
-    req.user = user;
+    // ✅ Attach only the necessary fields
+    (req as CustomRequest).user = {
+      id: user.id,
+      name: user.name,
+      mobile: user.mobile,
+      bio: user.bio,
+      profileUrl: user.profileUrl,
+    };
+
     next();
   } catch (err) {
     console.log(err);
-     res.status(401).json({ message: 'not authorized' });
+    res.status(401).json({ message: 'Not authorized' });
   }
 };
 
+// ✅ Route to check auth
 export const checkAuth = (req: Request, res: Response) => {
   try {
-    res.status(200).json(req.user);
+    const user = (req as CustomRequest).user;
+
+    if (!user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    res.status(200).json(user);
   } catch (error: any) {
     console.log('Error in checkAuth controller', error.message);
     res.status(500).json({ message: 'Internal Server Error' });

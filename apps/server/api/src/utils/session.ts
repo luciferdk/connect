@@ -5,11 +5,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 interface UserSession {
-	id:any;
-	name: string;
-	mobile: string;
-	bio?: string;
-	profileUrl?:string;
+  id: number; // prefer specific type
+  name?: string;
+  mobile: string;
+  bio?: string | null;
+  profileUrl?: string | null;
 }
 
 //Generate session token (e.g., JWT)
