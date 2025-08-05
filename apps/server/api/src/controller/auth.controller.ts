@@ -10,6 +10,7 @@ const prisma = new PrismaClient();
 
 // This interface now reflects the expected shape of req.body
 interface UserSession {
+  id: string;
   mobile: string;
   name: string;
   bio?: string | null;
@@ -71,7 +72,7 @@ export const authentic = async (req: Request, res: Response) => {
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Unable to create user in Database' });
-	return;
+        return;
       }
     }
 
@@ -84,7 +85,6 @@ export const authentic = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
-
 
 // logout.controller.ts
 export const logout = async (res: Response) => {

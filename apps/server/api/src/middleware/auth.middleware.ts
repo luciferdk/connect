@@ -8,7 +8,10 @@ import { PrismaClient } from '../generated/prisma';
 const prisma = new PrismaClient();
 
 // ✅ Updated CustomRequest: no `null`, only `undefined` or a valid user object
-interface CustomRequest extends Request {
+//
+//in the sence declearing the Coustorm Req or Request for user declear in globaly like given on the types/express.d.ts file
+//
+/* interface CustomRequest extends Request {
   user?: {
     id: number;
     name: string;
@@ -17,6 +20,7 @@ interface CustomRequest extends Request {
     profileUrl: string | null;
   };
 }
+*/
 
 // ✅ Middleware to protect routes
 export const protectRoute = async (
@@ -48,7 +52,7 @@ export const protectRoute = async (
     }
 
     // ✅ Attach only the necessary fields
-    (req as CustomRequest).user = {
+    req.user = {
       id: user.id,
       name: user.name,
       mobile: user.mobile,
@@ -66,8 +70,8 @@ export const protectRoute = async (
 // ✅ Route to check auth
 export const checkAuth = (req: Request, res: Response) => {
   try {
-    const user = (req as CustomRequest).user;
-
+    //const user = (req as CustomRequest).user;
+const user = req.user;
     if (!user) {
       res.status(401).json({ message: 'Unauthorized' });
       return;
