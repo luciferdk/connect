@@ -1,8 +1,11 @@
 'use client';
 import axios from 'axios';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 
 export default function HomePage() {
+const router = useRouter();
   const [step, setStep] = useState(1); // 1: phone input, 2: OTP input
   const [mobile, setMobile] = useState('');
   const [otp, setOtp] = useState('');
@@ -44,8 +47,9 @@ export default function HomePage() {
       const {data} = await axios.post('http://localhost:8080/api/auth/authentication', {mobile, otp });
       
 setMessage('OTP Verified Successfully!');
-//redirect or do otheraciton hear
 // You can redirect or update UI state here
+ router.push('pages/ChatPage');
+
     } catch (error:any) {
     console.error(error,'otp varification issue');
       setMessage('Error verifying OTP. Please try again.');
