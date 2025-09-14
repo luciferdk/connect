@@ -18,10 +18,12 @@ interface UserSession {
   otp?: number; // Corrected: int -> number
 }
 
+
 // Corrected function signature for an Express route handler
 export const authentic = async (req: Request, res: Response) => {
   //Destructure properties directly from req.body, and ensure correct field names
   const { mobile, otp, name, bio, profileUrl } = req.body as UserSession; // Cast req.body to UserData for type safety
+
 
   if (!otp) {
     // Basic validation for required fields
@@ -84,7 +86,9 @@ export const authentic = async (req: Request, res: Response) => {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
+  
 };
+
 
 // logout.controller.ts
 export const logout = async (res: Response) => {

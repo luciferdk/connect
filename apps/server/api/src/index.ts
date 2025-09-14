@@ -1,4 +1,4 @@
-//  ---  These fucking line must be the absolute first line when ever you use redis you should care these two line above the code like this.
+//  ---  These fucking two line must be top if you use redis
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -23,10 +23,15 @@ app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 
+//for authentication, logout,checkAuth
 app.use('/api/auth', authRoutes);
+//for sidebar, getMessage, sendMessage
 app.use('/api/messages', messagesRoutes);
+//for updateCredential
 app.use('/api/profile', profileRoutes);
+//for addContact
 app.use('/api/contact', addContactRoutes);
+//for delete user
 app.use('/api/delete', deleteRoutes);
 
 //Initialize Socket.io

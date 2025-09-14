@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import api from '../utils/api';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import axiosInstance from '../utils/axiosConfig';
 
 interface Contact {
   id: string;
@@ -10,25 +12,51 @@ interface Contact {
   bio?: string;
 }
 
-export default function Sidebar({ onSelect }: { onSelect: (id: string) => void }) {
+export default function Sidebar({
+  onSelect,
+}: {
+  onSelect: (id: string) => void;
+}) {
+  const router = useRouter();
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [profileUrl, setProfileUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchContacts = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get('/messages/user'); // ✅ relative to your baseURL
-        setContacts(res.data);
+        // ✅ fetch logged-in user profile
+        const userRes = await axios.get('/api/auth/verifyToken', {
+          withCredentials: true,
+        });
+        setProfileUrl(userRes.data.profileUrl);
+
+        // ✅ fetch contacts (use your API baseURL properly)
+        const contactsRes = await axiosIntance.get('/api/messages/users');
+        setContacts(contactsRes.data);
       } catch (err) {
-        console.error('Error fetching contacts:', err);
+        console.error('Error fetching data:', err);
       }
     };
 
-    fetchContacts(); // ✅ Fixed call
+    fetchData();
   }, []);
 
   return (
     <div className="w-1/4 border-r p-4 overflow-y-auto">
-      <h2 className="text-lg font-semibold mb-2">Contacts</h2>
+      {/* Profile button */}
+      <button
+        onClick={() => router.push('/profile')}
+        className="rounded-full shadow-lg hover:scale-105 transition"
+      >
+        <img
+          src={profileUrl || '/Screen.png'} // fallback if no profile image
+          alt="Profile"
+          className="w-16 h-16 rounded-full border-2 border-white object-cover"
+        />
+      </button>
+
+      <h2 className="text-lg font-semibold mb-2 mt-4">Your Contacts</h2>
+
       {contacts.map((c) => (
         <div
           key={c.id}

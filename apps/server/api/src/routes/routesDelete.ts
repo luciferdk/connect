@@ -1,11 +1,11 @@
 import express from 'express';
 
 import deleteUser from '../controller/deleteuser.controller';
-import {protectRoute} from '../middleware/auth.middleware';
+import { verifyToken } from '../utils/session';
 
 const router = express.Router();
 
-router.post('/userdeleted', protectRoute, deleteUser);
+router.post('/userdeleted', verifyToken, deleteUser);
 
 export default router;
 

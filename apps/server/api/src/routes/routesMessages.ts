@@ -1,5 +1,5 @@
 import express from 'express';
-import { protectRoute } from '../middleware/auth.middleware';
+import { verifyToken } from '../utils/session';
 import {
   getMessages,
   getUsersForSideBar,
@@ -8,11 +8,11 @@ import {
 
 const router = express.Router();
 
-
-router.get('/users', protectRoute, getUsersForSideBar);
-
-router.get('/:id', protectRoute, getMessages);
-
-router.post('/send/:id', protectRoute, sendMessages);
+//sideBar
+router.get('/users', verifyToken, getUsersForSideBar);
+//retrive messages
+router.get('/:id', verifyToken, getMessages);
+//sendMessages
+router.post('/send/:id', verifyToken, sendMessages);
 
 export default router;

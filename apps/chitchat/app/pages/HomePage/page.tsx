@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { useAuthStore } from './utils/userAuthStore';
 
 export default function HomePage() {
 const router = useRouter();

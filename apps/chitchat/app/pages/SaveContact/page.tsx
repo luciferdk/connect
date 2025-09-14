@@ -22,7 +22,7 @@ export default function AddContactPage() {
       setLoading(true);
 
       // ✅ Call backend API
-      await axios.post('http://localhost:3000/api/contact/addcontact', {
+      await axios.post('http://localhost:8080/api/contact/addcontact', {
         name,
         mobile,
       });

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Sidebar from '../../components/Sidebar';
 import ChatWindow from '../../components/ChatWindow';
 
-
 export default function ChatPage() {
   const router = useRouter();
   const [otherUserId, setOtherUserId] = useState<string | null>(null);
@@ -24,7 +23,7 @@ export default function ChatPage() {
 
       {/* Floating Add Contact button */}
       <button
-        onClick={() => router.push('../../pages/SaveContact')}
+        onClick={() => router.push('../pages/SaveContact')}
         className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-blue-700 transition"
       >
         + Add Contact

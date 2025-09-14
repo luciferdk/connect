@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import api from '../utils/api'; // Axios instance with withCredentials
+import axiosInstance from '../utils/axiosConfig'; // Axios instance with withCredentials
 import socket from '../utils/socket'; // Socket.IO client
 
 interface Message {
@@ -29,7 +29,7 @@ export default function ChatWindow({
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await api.get(`/messages/${otherUserId}`);
+        const res = await axiosInstance.get(`/messages/${otherUserId}`);
         setMessages(res.data);
       } catch (err) {
         console.error('Failed to fetch messages', err);

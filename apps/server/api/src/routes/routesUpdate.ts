@@ -1,10 +1,10 @@
 import express from 'express';
 import { updateBro } from '../controller/update.controller';
-import { protectRoute } from '../middleware/auth.middleware';
+import { verifyToken } from '../utils/session';
 
 const router = express.Router();
 
-router.put('/updateCredential', protectRoute, updateBro);
+router.put('/updateCredential', verifyToken, updateBro);
 
 
 export default router;

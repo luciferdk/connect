@@ -1,8 +1,8 @@
-import API from './axios';
+import axiosInstance from './axiosConfig';
 import socket from './socket';
 
 export const sendMessage = async ({to, content, mediaBase64, mediaType}) => {
-	const res = await API.post(`/message/send/${to}`, {
+	const res = await axiosInstance.post(`/message/send/${to}`, {
 		content,
 		mediaBase64,
 		mediaType,
