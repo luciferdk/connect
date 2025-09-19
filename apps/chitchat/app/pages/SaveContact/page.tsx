@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosConfig';
 import { useRouter } from 'next/navigation';
 
 export default function AddContactPage() {
@@ -22,13 +22,13 @@ export default function AddContactPage() {
       setLoading(true);
 
       // ✅ Call backend API
-      await axios.post('http://localhost:8080/api/contact/addcontact', {
+      await axiosInstance.post('/api/contact/addcontact', {
         name,
         mobile,
       });
 
       // ✅ Redirect on success
-      router.push('/');
+      router.push('/pages/ChatPage');
     } catch (err: any) {
       console.error('Error saving contact:', err);
       alert(err.response?.data?.message || 'Failed to save contact');

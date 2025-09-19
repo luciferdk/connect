@@ -36,17 +36,15 @@ export const generateToken = (user: UserSession, res: Response) => {
       expiresIn: '7d',
     });
 
-const isProd = process.env.NODE_ENV === 'production';
     // Set the cookie securely
     res.cookie('jwt', token, {
-      httpOnly: true, // Prevents XSS
-      secure: true,
-      sameSite: isProd ? 'none' : 'lax',
+      httpOnly: false, // Prevents XSS
+      secure: false,
+      sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     console.log('Token generated successfully', token);
-
 
     res.status(200).json({
       message: 'Authentication Successful',

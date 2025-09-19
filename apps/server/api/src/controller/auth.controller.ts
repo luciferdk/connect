@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { generateToken, degradeToken } from '../utils/session';
+import { Request, Response, NextFunction } from 'express';
+import { generateToken, verifyToken, degradeToken } from '../utils/session';
 import { sendOtp } from '../config/sendOtp';
 import { redisClient } from '../config/redis';
 import { PrismaClient } from '../generated/prisma';
@@ -18,12 +18,10 @@ interface UserSession {
   otp?: number; // Corrected: int -> number
 }
 
-
 // Corrected function signature for an Express route handler
 export const authentic = async (req: Request, res: Response) => {
   //Destructure properties directly from req.body, and ensure correct field names
   const { mobile, otp, name, bio, profileUrl } = req.body as UserSession; // Cast req.body to UserData for type safety
-
 
   if (!otp) {
     // Basic validation for required fields
@@ -61,7 +59,7 @@ export const authentic = async (req: Request, res: Response) => {
       try {
         //write a default url with dummy image
         const finalProfileUrl =
-          profileUrl ?? 'https://example.com/default-profile.png'; //or any other default URL
+          profileUrl ?? 'https://avatar.iran.liara.run/public'; //or any other default URL
         const justName = name ?? 'dhrup';
         user = await prisma.user.create({
           data: {
@@ -86,9 +84,7 @@ export const authentic = async (req: Request, res: Response) => {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
-  
 };
-
 
 // logout.controller.ts
 export const logout = async (res: Response) => {
@@ -98,5 +94,16 @@ export const logout = async (res: Response) => {
   } catch (error) {
     console.error('Logout error: ', error);
     res.status(500).json({ message: 'internal server error' });
+  }
+};
+
+
+// middleware to verify the website
+export const verify = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await verifyToken(req, res, next);
+  } catch (error) {
+    console.error('verify error', error);
+    res.status(500).json({ message: 'faield to varify' });
   }
 };

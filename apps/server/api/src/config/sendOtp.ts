@@ -3,7 +3,7 @@ dotenv.config();
 
 import { redisClient } from './redis';
 import { generateOTP } from '../utils/generateOtp';
-import axios from 'axios';
+//import axios from 'axios';
 
 
 
@@ -21,7 +21,8 @@ export const sendOtp = async (mobile: string): Promise<string> => {
   try {
     // Store OTP in Redis
     await redisClient.setEx(`otp:${mobile}`, 300, otp); //expire in 5 min
-
+    console.log(otp);
+/*
 console.log('API KEY:', process.env.FAST2SMS_API_KEY);
     // Send OTP Via SMS
     const response = await axios.post(
@@ -38,7 +39,7 @@ console.log('API KEY:', process.env.FAST2SMS_API_KEY);
         },
       },
     );
-    console.log('FASAT2SMS Response:', response.data);
+    console.log('FASAT2SMS Response:', response.data);*/
     return 'OTP Sent Successfully';
     //res.status(200).json({message:"Otp sent successfully"}) --this is use when you use (req,res) in function--
   } catch (err: any) {

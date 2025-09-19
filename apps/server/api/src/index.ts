@@ -8,8 +8,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import http from 'http';
 
-import messagesRoutes from './routes/routesMessages';
 import authRoutes from './routes/routesAuth';
+import messagesRoutes from './routes/routesMessages';
 import profileRoutes from './routes/routesUpdate';
 import addContactRoutes from './routes/routesContact';
 import deleteRoutes from './routes/routesDelete';

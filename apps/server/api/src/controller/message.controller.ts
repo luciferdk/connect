@@ -1,3 +1,4 @@
+// src/controller/message.controller.ts
 import { PrismaClient } from '../generated/prisma';
 import { Request, Response } from 'express';
 import cloudinary from '../config/cloudinary';
@@ -5,12 +6,29 @@ import { getIo } from '../config/socket';
 
 const prisma = new PrismaClient();
 
-
-//load sidebar of user details
+// This endpoint fetches the logged-in user's data and their contacts
 export const getUsersForSideBar = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
 
+    // Fetch the logged-in user's details
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        profileUrl: true,
+      },
+    });
+
+    if (!user) {
+      // The `res.status().json()` call sends the response.
+      // We just need to exit the function with a simple `return;`
+      res.status(404).json({ message: 'User not found' });
+      return; 
+    }
+
+    // Fetch the user's saved contacts
     const contacts = await prisma.contact.findMany({
       where: { ownerId: userId },
       include: {
@@ -26,13 +44,25 @@ export const getUsersForSideBar = async (req: Request, res: Response) => {
       },
     });
 
+    // Format the contacts data
     const formattedContacts = contacts.map((entry) => entry.contact);
-    res.status(200).json(formattedContacts);
+
+    // Combine user's data and contacts into a single response
+    const sidebarData = {
+      user,
+      contacts: formattedContacts,
+    };
+
+    // This line sends the final response. No `return` is needed here either.
+    res.status(200).json(sidebarData);
   } catch (error) {
-    console.log('error in userSideBar', error);
-    res.status(500).json({ message: 'Internal message server error sidebar' });
+    console.error('Error in getUsersForSideBar:', error);
+    // Send an error response. The function will implicitly end here.
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
 
 //loading chat history of user and receiver
 export const getMessages = async (req: Request, res: Response) => {
@@ -40,11 +70,21 @@ export const getMessages = async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const otherUserId = req.params.id;
 
+    // last 24 hours cutoff
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
     const messages = await prisma.message.findMany({
       where: {
-        OR: [
-          { senderId: userId, recipientId: otherUserId },
-          { senderId: otherUserId, recipientId: userId },
+        AND: [
+          {
+            timestamp: { gte: cutoff }, // only last 24 hrs
+          },
+          {
+            OR: [
+              { senderId: userId, recipientId: otherUserId },
+              { senderId: otherUserId, recipientId: userId },
+            ],
+          },
         ],
       },
       orderBy: { timestamp: 'asc' },
@@ -53,13 +93,15 @@ export const getMessages = async (req: Request, res: Response) => {
     res.status(200).json(messages);
   } catch (error) {
     console.log('error while loading chat history', error);
-    res.status(500).json({ messages: 'faield to get messages' });
+    res.status(500).json({ messages: 'failed to get messages' });
   }
 };
 
+
+
 //send messages
 export const sendMessages = async (req: Request, res: Response) => {
-	const io = getIo();
+  const io = getIo();
   try {
     const { content, mediaBase64, mediaType } = req.body;
     const recipientId = req.params.id;
@@ -69,7 +111,7 @@ export const sendMessages = async (req: Request, res: Response) => {
 
     if (mediaBase64) {
       const upload = await cloudinary.uploader.upload(mediaBase64, {
-        resource_type: 'auto', //handles audio/video/image/doc
+        resource_type: 'auto',
       });
       mediaUrl = upload.secure_url;
     }
@@ -82,23 +124,13 @@ export const sendMessages = async (req: Request, res: Response) => {
         mediaUrl,
         mediaType,
       },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            name: true,
-            mobile: true,
-            profileUrl: true,
-          },
-        },
-      },
     });
 
-    //Emit to recipien'ts room
-    io.to(recipientId).emit('recive_message', newMessage);
+    // Emit to recipient
+    io.to(recipientId).emit('receive_message', newMessage);
 
-    //Also Emit to sender's room to update their own UI
-    io.to(senderId).emit('message_send', newMessage);
+    // Emit to sender for confirmation
+    io.to(senderId).emit('message_sent', newMessage);
 
     res.status(201).json(newMessage);
   } catch (error) {

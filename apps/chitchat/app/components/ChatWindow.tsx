@@ -2,8 +2,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axiosInstance from '../utils/axiosConfig'; // Axios instance with withCredentials
-import socket from '../utils/socket'; // Socket.IO client
+import axiosInstance from '../utils/axiosConfig';
+import socket from '../utils/socket';
 
 interface Message {
   id: string;
@@ -46,7 +46,7 @@ export default function ChatWindow({
     // 👤 Join your own socket room
     socket.emit('join', currentUserId);
 
-    // 🔁 Incoming message from another user
+    // 🔁 Incoming message
     socket.on('receive_message', (msg: Message) => {
       if (msg.senderId === otherUserId || msg.recipientId === otherUserId) {
         setMessages((prev) => [...prev, msg]);
@@ -61,7 +61,7 @@ export default function ChatWindow({
     });
 
     return () => {
-      socket.disconnect(); // 👈 optional
+      socket.disconnect();
       socket.off('receive_message');
       socket.off('message_sent');
     };
@@ -73,7 +73,7 @@ export default function ChatWindow({
     if (!trimmed) return;
 
     try {
-      const res = await api.post(`/messages/send/${otherUserId}`, {
+      const res = await axiosInstance.post(`/messages/send/${otherUserId}`, {
         content: trimmed,
       });
 
