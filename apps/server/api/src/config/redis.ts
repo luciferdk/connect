@@ -5,6 +5,7 @@ export const redisClient: RedisClientType = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379', // Use an environment variable for the Redis URL
 });
 
+//------- hendale connection ------------//
 redisClient.on('connect', () => {
   console.log('Connected to Redis!');
 });
@@ -14,9 +15,10 @@ redisClient.on('error', (err: any) => {
   console.error('Redis Client Error:', err);
 });
 
-// Connect to Redis
+//------------Call / Connect to RedisClient --------------/
 async function connectRedis() {
   try {
+    //connect() is start to open redisClient server and TCP connection Redis server (local or remote)
     await redisClient.connect();
     console.log('Redis client connected successfully.');
   } catch (err: any) {
@@ -27,8 +29,3 @@ async function connectRedis() {
 }
 
 connectRedis(); // Call the connect function
-
-// You might also want to export the connect function if you need to manually trigger it elsewhere
-// export { connectRedis };
-
-// If you need to use redisClient in other files, it's already exported above.

@@ -1,5 +1,5 @@
 'use client';
-import HomePage from './pages/HomePage/page';
+import ChatPage from './pages/ChatPage/page';
 import { Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -28,7 +28,7 @@ export default function Home() {
 
   return (
     <div>
-      <HomePage />
+      <ChatPage />
     </div>
   );
 }

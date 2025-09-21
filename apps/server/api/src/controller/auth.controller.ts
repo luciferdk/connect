@@ -8,102 +8,127 @@ import dotenv from 'dotenv';
 dotenv.config();
 const prisma = new PrismaClient();
 
-// This interface now reflects the expected shape of req.body
+// Interface for user session
 interface UserSession {
-  id: string;
+  id?: string; // id should be optional in request bodies
   mobile: string;
-  name: string;
+  name?: string;
   bio?: string | null;
-  profileUrl?: string | null; // Corrected: profileImg -> profileUrl
-  otp?: number; // Corrected: int -> number
+  profileUrl?: string; // make optional, set default on register
+  otp?: number; // optional, since step 1 request won’t have OTP
 }
 
-// Corrected function signature for an Express route handler
-export const authentic = async (req: Request, res: Response) => {
-  //Destructure properties directly from req.body, and ensure correct field names
-  const { mobile, otp, name, bio, profileUrl } = req.body as UserSession; // Cast req.body to UserData for type safety
+// ------------------ LOGIN ------------------
+export const authentic = async (req: Request, res: Response): Promise<void> => {
+  const { mobile, otp } = req.body as UserSession;
 
+  if (!mobile) {
+    res.status(400).json({ error: 'Mobile number is required' });
+    return;
+  }
+
+  // Step 1 → Send OTP if no OTP provided
   if (!otp) {
-    // Basic validation for required fields
     try {
       const message = await sendOtp(mobile);
-      res.status(200).json({ message });
-    } catch (err) {
-      console.error(err);
-      if (err instanceof Error) {
-        res.status(400).json({ error: err.message });
-      } else {
-        res.status(500).json({ error: 'Unknown error occured' });
-      }
+      res.status(200).json({ message: `OTP sent to ${mobile}`, info: message });
+      return;
+    } catch (error) {
+      console.error('OTP send error:', error);
+      res.status(500).json({ message: 'Failed to send OTP' });
+      return;
     }
+  }
+
+  try {
+    // Step 2 → Verify OTP
+    const storeOtp = await redisClient.get(`otp:${mobile}`);
+    if (!storeOtp || storeOtp !== otp.toString()) {
+      res.status(401).json({ error: 'Invalid or expired OTP' });
+      return;
+    }
+
+    // Check if user exists
+    let user = await prisma.user.findUnique({ where: { mobile } });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found, please register' });
+      return;
+    }
+
+    // Delete OTP from redis after successful verification
+    await redisClient.del(`otp:${mobile}`);
+
+    // Generate JWT token
+    await generateToken(user, res);
+    return;
+  } catch (error) {
+    console.error('Auth error:', error);
+    res.status(500).json({ error: 'Server error' });
+    return;
+  }
+};
+
+// ------------------ REGISTER ------------------
+export const register = async (req: Request, res: Response): Promise<void> => {
+  const { mobile, name, bio, profileUrl } = req.body as UserSession;
+
+  if (!mobile || !name) {
+    res.status(400).json({ error: 'Mobile and Name are required' });
     return;
   }
 
   try {
-    // Get OTP from redis
-    const storeOtp = await redisClient.get(`otp:${mobile}`);
-    // Ensure OTPs are compared as strings if storeOtp is a string
-    if (storeOtp !== otp?.toString()) {
-      // Convert otp to string for comparison if it's a number
-      res.status(401).json({ error: ' Invalid or expired OTP ' });
+    const finalProfileUrl =
+      profileUrl ??
+      'https://i.pinimgproxy.com/?url=aHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS8yNTYvMTA0MTIvMTA0MTIzODMucG5n&ts=1758454389&sig=1b4a010450b5e392d9f1119e6113c7f49220245b109ff116d1df16388e1afc27';
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { mobile } });
+    if (existingUser) {
+      res.status(409).json({ error: 'User already exists' });
       return;
     }
 
-    // check if user exists
-    let user = await prisma.user.findUnique({
-      where: { mobile },
+    // Create new user
+    const user = await prisma.user.create({
+      data: { mobile, name, bio, profileUrl: finalProfileUrl },
     });
 
-    // if not present then create one
-    if (!user) {
-      try {
-        //write a default url with dummy image
-        const finalProfileUrl =
-          profileUrl ?? 'https://avatar.iran.liara.run/public'; //or any other default URL
-        const justName = name ?? 'dhrup';
-        user = await prisma.user.create({
-          data: {
-            mobile,
-            name: justName,
-            bio,
-            profileUrl: finalProfileUrl,
-          },
-        });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Unable to create user in Database' });
-        return;
-      }
-    }
-
-    await generateToken(user, res);
-
-    // Delete OTP from redis after successful authentication
-    await redisClient.del(`otp:${mobile}`);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    await generateToken(user, res); // sets cookie internally
+    res.status(201).json({ message: 'Created successfully' }); // only send JSON, don't include token
+    return;
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ error: 'Unable to create user in Database' });
+    return;
   }
 };
 
-// logout.controller.ts
-export const logout = async (res: Response) => {
+// ------------------ LOGOUT ------------------
+export const logout = async (req: Request, res: Response): Promise<void> => {
   try {
     await degradeToken(res);
     res.status(200).json({ message: 'You are logged out successfully' });
+    return;
   } catch (error) {
-    console.error('Logout error: ', error);
-    res.status(500).json({ message: 'internal server error' });
+    console.error('Logout error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+    return;
   }
 };
 
-
-// middleware to verify the website
-export const verify = async (req: Request, res: Response, next: NextFunction) => {
+// ------------------ VERIFY TOKEN MIDDLEWARE ------------------
+export const verify = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     await verifyToken(req, res, next);
   } catch (error) {
-    console.error('verify error', error);
-    res.status(500).json({ message: 'faield to varify' });
+    console.error('Verify error:', error);
+    res.status(401).json({ error: 'Failed to verify token' });
+    return;
   }
 };

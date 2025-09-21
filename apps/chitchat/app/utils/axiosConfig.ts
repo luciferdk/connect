@@ -1,6 +1,7 @@
 // utils/axiosConfig.ts
 
 import axios from 'axios';
+import HomePage from '../pages/HomePage';
 
 // Create axios instance with cookie support
 const axiosInstance = axios.create({
@@ -17,7 +18,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
-        window.location.href = '/';
+        window.location.href = '../pages/HomePage';
       }
     }
     return Promise.reject(error);
