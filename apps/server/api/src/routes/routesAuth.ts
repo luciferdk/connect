@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.post('/authentication', authentic);
 router.post('/register', register);
-router.get('/verifyToken', verify);
+router.get('/check', verify);
 router.post('/degradeToken', logout);
 
 export default router;

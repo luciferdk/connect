@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { generateToken, verifyToken, degradeToken } from '../utils/session';
 import { sendOtp } from '../config/sendOtp';
 import { redisClient } from '../config/redis';
@@ -61,6 +61,7 @@ export const authentic = async (req: Request, res: Response): Promise<void> => {
 
     // Generate JWT token
     await generateToken(user, res);
+    res.status(200).json({ message: 'User Login successful!' });
     return;
   } catch (error) {
     console.error('Auth error:', error);
@@ -80,8 +81,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const finalProfileUrl =
-      profileUrl ??
-      'https://i.pinimgproxy.com/?url=aHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS8yNTYvMTA0MTIvMTA0MTIzODMucG5n&ts=1758454389&sig=1b4a010450b5e392d9f1119e6113c7f49220245b109ff116d1df16388e1afc27';
+      profileUrl ?? 'https://avatar.iran.liara.run/public';
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { mobile } });
@@ -119,13 +119,12 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 };
 
 // ------------------ VERIFY TOKEN MIDDLEWARE ------------------
-export const verify = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+export const verify = async (req: Request, res: Response): Promise<void> => {
   try {
-    await verifyToken(req, res, next);
+    //run the middleware manually
+    await verifyToken(req, res, () => {
+      res.status(200).json({ user: (req as any).user });
+    });
   } catch (error) {
     console.error('Verify error:', error);
     res.status(401).json({ error: 'Failed to verify token' });

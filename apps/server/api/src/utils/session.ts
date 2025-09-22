@@ -19,12 +19,12 @@ interface JWTPayload {
 }
 
 // Extend Express Request to allow req.user
-declare module 'express-serve-static-core' {
+/*declare module 'express-serve-static-core' {
   interface Request {
     user?: JWTPayload;
   }
 }
-
+*/
 // ---------------- GENERATE TOKEN ----------------
 export const generateToken = (user: UserSession, res: Response): void => {
   if (!process.env.JWT_SECRET) {
@@ -47,8 +47,7 @@ export const generateToken = (user: UserSession, res: Response): void => {
   console.log('✅ Token generated for user:', user.id);
 };
 
-
-// ---------------- VERIFY TOKEN ----------------
+// ---------------- VERIFY TOKEN or Middleware ----------------
 export const verifyToken = (
   req: Request,
   res: Response,
@@ -69,15 +68,13 @@ export const verifyToken = (
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as JWTPayload;
-    req.user = decoded; // attach user payload
-    next();
+    (req as any).user = decoded; // attach user payload to Request
+    next(); //move to the route handler
   } catch (error) {
     console.error('❌ Token verification error:', error);
     res.status(401).json({ error: 'Invalid or expired token.' });
   }
 };
-
-
 
 // ---------------- LOGOUT ----------------
 export const degradeToken = (res: Response): void => {
