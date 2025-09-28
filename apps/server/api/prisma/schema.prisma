@@ -34,8 +34,9 @@ model User {
 
 model Contact {
   id        String @id @default(uuid())
-  ownerId   String // User who owns this contact
-  contactId String // The user being added as contact
+  ownerId   String  // User who owns this contact
+  contactId String  // The user being added as contact
+  nickname  String? //NickName set by owner
 
   owner   User @relation("UserContacts", fields: [ownerId], references: [id])
   contact User @relation("AsContact", fields: [contactId], references: [id])

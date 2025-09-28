@@ -16,7 +16,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get('/api/user/me', { withCredentials: true });
+        const res = await axios.get('/api/user', { withCredentials: true });
         setUser(res.data);
       } catch (error) {
         console.error('Failed to fetch user:', error);

@@ -15,7 +15,7 @@
     "serve": "nodemon --watch src --ext ts --exec ts-node src/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.10.1",
+    "@prisma/client": "^6.16.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.9",
     "@types/twilio": "^3.19.2",
@@ -45,7 +45,7 @@
     "eslint": "^9.29.0",
     "globals": "^16.2.0",
     "nodemon": "^3.1.10",
-    "prisma": "^6.10.1",
+    "prisma": "^6.16.2",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.19.4",

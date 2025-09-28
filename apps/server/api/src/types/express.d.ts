@@ -4,6 +4,7 @@ declare global {
       user?: {
         id: string;
         name: string;
+	nickname: string;
         mobile: string;
         bio: string | null;
         profileUrl: string | null;

@@ -4,58 +4,46 @@
 import { useEffect, useState } from 'react';
 import axiosInstance from '../utils/axiosConfig';
 import socket from '../utils/socket';
+import { useParams } from 'react-router-dom';
+
 
 interface Message {
   id: string;
   content?: string;
   mediaUrl?: string;
-  mediaType?: string; // image, video, doc, audio
+  mediaType?: string;
   senderId: string;
   recipientId: string;
   timestamp: string;
 }
 
-export default function ChatWindow({
-  otherUserId,
-  currentUserId,
-}: {
-  otherUserId: string;
-  currentUserId: string;
-}) {
+export default function ChatWindow({ otherUserId }: { otherUserId: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [file, setFile] = useState<File | null>(null);
 
-  // 🔁 Load previous messages with this user
+  const currentUserId = "me"; // TODO: replace with JWT decoded userId
+
+  // Load chat history
   useEffect(() => {
-    const fetchMessages = async () => {
+    async function fetchMessages() {
       try {
         const res = await axiosInstance.get(`/messages/${otherUserId}`);
         setMessages(res.data);
       } catch (err) {
         console.error('Failed to fetch messages', err);
       }
-    };
-
+    }
     fetchMessages();
   }, [otherUserId]);
 
-  // 📡 Set up socket.io listeners
+  // Socket listeners
   useEffect(() => {
     socket.connect();
-
-    // 👤 Join your own socket room
     socket.emit('join', currentUserId);
 
-    // 🔁 Incoming message
     socket.on('receive_message', (msg: Message) => {
       if (msg.senderId === otherUserId || msg.recipientId === otherUserId) {
-        setMessages((prev) => [...prev, msg]);
-      }
-    });
-
-    // ✅ Confirmation of sent message
-    socket.on('message_sent', (msg: Message) => {
-      if (msg.recipientId === otherUserId) {
         setMessages((prev) => [...prev, msg]);
       }
     });
@@ -63,51 +51,51 @@ export default function ChatWindow({
     return () => {
       socket.disconnect();
       socket.off('receive_message');
-      socket.off('message_sent');
     };
-  }, [otherUserId, currentUserId]);
+  }, [otherUserId]);
 
-  // 🚀 Send message
+  // Send text / file
   const send = async () => {
-    const trimmed = newMessage.trim();
-    if (!trimmed) return;
+    if (!newMessage.trim() && !file) return;
 
     try {
-      const res = await axiosInstance.post(`/messages/send/${otherUserId}`, {
-        content: trimmed,
-      });
+      let payload: any = { content: newMessage.trim() };
 
-      // 🔊 Emit via socket
-      socket.emit('send_message', {
-        recipientId: otherUserId,
-        message: res.data,
-      });
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const uploadRes = await axiosInstance.post(`/messages/upload`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        payload.mediaUrl = uploadRes.data.url;
+        payload.mediaType = file.type;
+      }
+
+      const res = await axiosInstance.post(`/messages/send/${otherUserId}`, payload);
+
+      socket.emit('send_message', { recipientId: otherUserId, message: res.data });
 
       setNewMessage('');
+      setFile(null);
     } catch (err) {
       console.error('Failed to send message', err);
     }
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto flex flex-col h-screen p-4">
-      <div className="flex-1 overflow-y-auto space-y-2 border rounded p-2">
+    <div className="flex-1 flex flex-col h-screen p-4 mb-[130]">
+      {/* Chat history */}
+      <div className="flex-1 overflow-y-auto space-y-2 border rounded p-2 pb-35">
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`max-w-xs p-2 rounded ${
-              msg.senderId === currentUserId
-                ? 'bg-blue-100 self-end'
-                : 'bg-gray-100 self-start'
+              msg.senderId === currentUserId ? 'bg-blue-100 self-end' : 'bg-gray-100 self-start'
             }`}
           >
             {msg.mediaUrl ? (
               msg.mediaType?.startsWith('image') ? (
-                <img
-                  src={msg.mediaUrl}
-                  alt="Media"
-                  className="rounded max-w-full h-auto"
-                />
+                <img src={msg.mediaUrl} alt="Media" className="rounded max-w-full h-auto" />
               ) : (
                 <a
                   href={msg.mediaUrl}
@@ -125,17 +113,23 @@ export default function ChatWindow({
         ))}
       </div>
 
-      <div className="mt-4 flex items-center">
+      {/* Input */}
+      <div className="mt-4 flex items-center space-x-2">
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          className="border px-2 py-1 rounded text-sm"
+        />
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 border px-4 py-2 rounded-l focus:outline-none"
+          className="flex-1 border px-4 py-2 rounded focus:outline-none"
           placeholder="Type a message..."
         />
         <button
           onClick={send}
-          className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Send
         </button>

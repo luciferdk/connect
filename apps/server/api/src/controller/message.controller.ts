@@ -25,17 +25,20 @@ export const getUsersForSideBar = async (req: Request, res: Response) => {
       // The `res.status().json()` call sends the response.
       // We just need to exit the function with a simple `return;`
       res.status(404).json({ message: 'User not found' });
-      return; 
+      return;
     }
 
     // Fetch the user's saved contacts
     const contacts = await prisma.contact.findMany({
       where: { ownerId: userId },
-      include: {
+      select: {
+        // Using select to retrive scalar fields and the reloation
+        id: true,
+        nickname: true, //Retain the nicname from the Contact Model
         contact: {
           select: {
             id: true,
-            name: true,
+	    name: true,
             profileUrl: true,
             bio: true,
             mobile: true,
@@ -45,7 +48,12 @@ export const getUsersForSideBar = async (req: Request, res: Response) => {
     });
 
     // Format the contacts data
-    const formattedContacts = contacts.map((entry) => entry.contact);
+    const formattedContacts = contacts.map((entry) => ({
+      //Spread all fields from the actual User object (id,name,profileUrl, bio)
+      ...entry.contact,
+      //OverWrite/add the ncikname from the Contact Model
+      nickname: entry.nickname,
+    }));
 
     // Combine user's data and contacts into a single response
     const sidebarData = {
@@ -61,8 +69,6 @@ export const getUsersForSideBar = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
 
 //loading chat history of user and receiver
 export const getMessages = async (req: Request, res: Response) => {
@@ -96,8 +102,6 @@ export const getMessages = async (req: Request, res: Response) => {
     res.status(500).json({ messages: 'failed to get messages' });
   }
 };
-
-
 
 //send messages
 export const sendMessages = async (req: Request, res: Response) => {

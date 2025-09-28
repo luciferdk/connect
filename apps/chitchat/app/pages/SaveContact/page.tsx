@@ -6,14 +6,14 @@ import { useRouter } from 'next/navigation';
 
 export default function AddContactPage() {
   const router = useRouter();
-  const [name, setName] = useState('');
+  const [nickname, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !mobile) {
+    if (!nickname || !mobile) {
       alert('Please enter both name and mobile number');
       return;
     }
@@ -23,7 +23,7 @@ export default function AddContactPage() {
 
       // ✅ Call backend API
       await axiosInstance.post('/api/contact/addcontact', {
-        name,
+        nickname,
         mobile,
       });
 
@@ -32,6 +32,7 @@ export default function AddContactPage() {
     } catch (err: any) {
       console.error('Error saving contact:', err);
       alert(err.response?.data?.message || 'Failed to save contact');
+      router.push('/pages/ChatPage');
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,7 @@ export default function AddContactPage() {
         <label className="block mb-2 font-medium">Name</label>
         <input
           type="text"
-          value={name}
+          value={nickname}
           onChange={(e) => setName(e.target.value)}
           className="w-full border rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="Enter name"
