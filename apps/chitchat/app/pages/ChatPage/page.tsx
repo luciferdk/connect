@@ -2,23 +2,38 @@
 
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import ChatWindow from '../../components/ChatWindow';
+import axiosInstance from '../../utils/axiosConfig';
+
 
 export default function ChatPage() {
   const router = useRouter();
-  const [otherUserId, setOtherUserId] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<{id: string; name:string; profileUrl: string } | null>(null);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+
+  useEffect(() => {
+  async function fetchUser() {
+  try {
+  const res = await axiosInstance.get('/api/auth/check');
+  setCurrentUser(res.data.user);
+  } catch (err) {
+  console.error('Failed to load user Info',err);
+  }
+  }
+  fetchUser();
+}, []);
 
   return (
     <div className="flex h-screen relative">
       {/* Sidebar with contact list */}
-      <Sidebar onSelect={(id) => setOtherUserId(id)} />
+      <Sidebar onSelect={setSelectedContactId} />
 
       {/* If no contact selected → show placeholder */}
       <div className="flex-1 flex items-center justify-center bg-gray-100">
-        {otherUserId ? (
-          <ChatWindow otherUserId={otherUserId} />
+        { selectedContactId && currentUser ? (
+          <ChatWindow currentUserId={currentUser.id} otherUserId={selectedContactId} />
         ) : (
           <p className="text-gray-600 text-lg">Select a contact to start chatting</p>
         )}

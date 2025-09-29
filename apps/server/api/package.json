@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc -b && cp -r ./src/generated ./dist/generated",
     "start": "node dist/index.js",
-    "dev": "concurrently -k -n \"LINT,NODE\" -c \"yellow.bold,cyan.bold\" \"npm run lint:watch\" \"npm run serve\"",
+    "dev": "concurrently -k -n \"LINT,NODE\" -c \"yellow.bold,cyan.bold\" \"npm run lint:watch\" \"npm run serve 8080\"",
     "lint:watch": "nodemon --watch src --ext ts --exec \"npm run lint:check\"",
     "lint:check": "eslint . --ext .ts",
     "serve": "nodemon --watch src --ext ts --exec ts-node src/index.ts"

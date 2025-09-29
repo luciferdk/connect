@@ -103,6 +103,7 @@ export const getMessages = async (req: Request, res: Response) => {
   }
 };
 
+
 //send messages
 export const sendMessages = async (req: Request, res: Response) => {
   const io = getIo();
@@ -115,7 +116,7 @@ export const sendMessages = async (req: Request, res: Response) => {
 
     if (mediaBase64) {
       const upload = await cloudinary.uploader.upload(mediaBase64, {
-        resource_type: 'auto',
+        resource_type: 'auto', //auto handle image, video, audio, docs
       });
       mediaUrl = upload.secure_url;
     }

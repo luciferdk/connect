@@ -4,9 +4,10 @@ dotenv.config();
 
 //  --now no one care these line where imported
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import http from 'http';
+
 
 import authRoutes from './routes/routesAuth';
 import messagesRoutes from './routes/routesMessages';
@@ -15,14 +16,17 @@ import addContactRoutes from './routes/routesContact';
 import deleteRoutes from './routes/routesDelete';
 import { setupSocket } from './config/socket';
 
-const app = express();
-const server = http.createServer(app);
-const PORT = process.env.PORT;
 
+const PORT = process.env.PORT;
+const app = express();
+const server = http.createServer(app);//Important: attach to server
+
+//middleware
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '100mb' }));
 app.use(cookieParser());
 
+// <- Routes ->
 //for authentication, logout,checkAuth
 app.use('/api/auth', authRoutes);
 //for sidebar, getMessage, sendMessage
@@ -38,6 +42,6 @@ app.use('/api/delete', deleteRoutes);
 setupSocket(server);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is listening on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`🚀 Server + socket.io is listening on port ${PORT}`);
 });

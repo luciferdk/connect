@@ -53,6 +53,7 @@ model Message {
   mediaType   String? // image, video, doc, audio
   timestamp   DateTime @default(now())
   groupId     String?
+  delivered Boolean @default(false);
 
   sender    User @relation("SentMessages", fields: [senderId], references: [id])
   recipient User @relation("ReceivedMessages", fields: [recipientId], references: [id])
