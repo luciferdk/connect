@@ -8,7 +8,7 @@ let isInitialized = false;
 export const setupSocket = (server: HTTPServer) => {
 io = new Server(server, {
     cors: {
-      origin: 'http:localhost:3000',
+      origin: 'http:192.168.1.8:3000',
       credentials: true,
     },
   });
@@ -23,10 +23,10 @@ isInitialized = true;
       console.log(`📦 User ${userId} joined room`);
     });
 
-    socket.on('send_message', ({ recipientId, message }) => {
+    /*socket.on('send_message', ({ recipientId, message }) => {
       io.to(recipientId).emit('recive_message', message); //send to recipient
       io.to(message.senderId).emit('rececive_message', message); // send back to sender for confirmation
-    });
+    });*/
 
     socket.on('❌ disconnect', () => {
       console.log('A user disconnected', socket.id);
