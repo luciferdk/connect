@@ -6,7 +6,7 @@ import HomePage from '../pages/HomePage';
 // Create axios instance with cookie support
 const axiosInstance = axios.create({
   // ✅ Correct baseURL to the root of your API
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://192.168.1.8:8080',
   withCredentials: true,
 });
 

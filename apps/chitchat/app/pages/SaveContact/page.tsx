@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 export default function AddContactPage() {
   const router = useRouter();
-  const [nickname, setName] = useState('');
+  const [nickname, setNickName] = useState('');
   const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -50,7 +50,7 @@ export default function AddContactPage() {
         <input
           type="text"
           value={nickname}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setNickName(e.target.value)}
           className="w-full border rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="Enter name"
           required

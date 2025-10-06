@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const addNewContact = async (req: Request, res: Response) => {
   try {
     const ownerId = req.user!.id;
-    const { mobile, name } = req.body;
+    const { mobile, nickname } = req.body;
     const contactUser = await prisma.user.findUnique({ where: { mobile } });
 
     if (!contactUser) {
@@ -35,7 +35,7 @@ const addNewContact = async (req: Request, res: Response) => {
       data: {
         ownerId,
         contactId: contactUser.id,
-	nickname: name,
+	nickname: nickname,
       },
     });
 

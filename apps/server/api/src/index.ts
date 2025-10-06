@@ -17,12 +17,12 @@ import deleteRoutes from './routes/routesDelete';
 import { setupSocket } from './config/socket';
 
 
-const PORT = process.env.PORT;
+const PORT = Number(process.env.PORT);
 const app = express();
 const server = http.createServer(app);//Important: attach to server
 
 //middleware
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin:  'http://192.168.1.8:3000', credentials: true }));
 app.use(express.json({ limit: '100mb' }));
 app.use(cookieParser());
 
@@ -43,5 +43,5 @@ setupSocket(server);
 
 // Start server
 server.listen(PORT, () => {
-  console.log(`🚀 Server + socket.io is listening on port ${PORT}`);
+  console.log(`🚀 Server + socket.io is listening on PORT http://${PORT}`);
 });
