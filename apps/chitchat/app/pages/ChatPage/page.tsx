@@ -96,7 +96,7 @@ export default function ChatPage() {
       {/* 🕶️ Mobile Overlay when Sidebar open */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 md:hidden"
+          className="fixed inset-0 h-screen bg-black/30 backdrop-blur-sm z-30 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}

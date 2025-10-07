@@ -1,15 +1,12 @@
+//app/componenets/Sidebar.tsx
+
 'use client';
-
 import { useEffect, useState } from 'react';
-
 import axiosInstance from '../utils/axiosConfig';
-
 import { useNavigate } from 'react-router-dom';
-
 import { useRouter } from 'next/navigation';
 
 //---------- Interfaces ------------
-
 interface Contact {
   id: string;
   name: string; // fallback if nickname missing
@@ -29,7 +26,6 @@ interface UserData {
 }
 
 //----------------------------------
-
 export default function UserSidebar({
   onSelect,
 }: {
@@ -40,7 +36,6 @@ export default function UserSidebar({
   const [error, setError] = useState<string | null>(null);
 
   const API_ENDPOINT = '/api/messages/users';
-
   const router = useRouter();
 
   useEffect(() => {
@@ -90,17 +85,19 @@ export default function UserSidebar({
           <h2 className="text-lg font-bold truncate">{data?.user.name}</h2>
 
           <button
-            onClick={() => router.push('../pages/ProfilePage')}
-            className="text-xs text-gray-400"
+            onClick={() => router.push('../../pages/ProfilePage')}
+            className="text-sm text-blue-400 hover:bg-gray-400 activity:bg-gray-400 bg-gray-700 rounded-full p-2"
           >
             My Profile
           </button>
         </div>
       </div>
 
-      {/* Contacts */}
 
+
+{/* Contacts */}
       <div className="flex-1 overflow-y-auto p-2">
+      <button className="block item-center p-2 text-sm rounded-full hover:bg-sky-400 active:bg-sky-400 rounded-full bg-gray-700 m-2">Create group</button>
         <ul className="space-y-2">
           {data?.contacts?.length ? (
             data.contacts.map((contact) => (
