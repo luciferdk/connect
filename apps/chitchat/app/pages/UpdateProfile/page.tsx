@@ -27,7 +27,7 @@ export default function UpdateProfile() {
       });
 
       setMessage('Profile updated successfully!');
-    } catch (error: any) {
+    } catch (error: string) {
       setMessage(error.response?.data?.error || 'Update failed');
     }
   };

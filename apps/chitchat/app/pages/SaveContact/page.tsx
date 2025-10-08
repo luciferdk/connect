@@ -29,7 +29,7 @@ export default function AddContactPage() {
 
       // ✅ Redirect on success
       router.push('/pages/ChatPage');
-    } catch (err: any) {
+    } catch (err: string) {
       console.error('Error saving contact:', err);
       alert(err.response?.data?.message || 'Failed to save contact');
       router.push('/pages/ChatPage');

@@ -10,6 +10,7 @@ io = new Server(server, {
     cors: {
       origin: 'http:192.168.1.8:3000',
       credentials: true,
+      methods: ["GET", "POST"],
     },
   });
 isInitialized = true;

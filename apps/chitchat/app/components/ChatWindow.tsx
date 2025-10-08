@@ -5,7 +5,13 @@
 import { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../utils/axiosConfig';
 import socket from '../utils/socket';
+import Image from 'next/image';
 
+interface MessagePayload {
+  content: string;
+  mediaBase64?: string;
+  mediaType?: string;
+}
 interface Message {
   id: string;
   content?: string;
@@ -90,7 +96,7 @@ export default function ChatWindow({
     setMessages((prev) => [...prev, tempMsg]);
 
     try {
-      const payload: any = { content: newMessage.trim() };
+      const payload: MessagePayload = { content: newMessage.trim() };
 
       if (file) {
         const base64 = await toBase64(file);
@@ -139,11 +145,21 @@ export default function ChatWindow({
           >
             {msg.mediaUrl ? (
               msg.mediaType?.startsWith('image') ? (
-                <img
-                  src={msg.mediaUrl}
-                  alt="Media"
-                  className="rounded-lg max-w-full h-auto"
-                />
+                msg.mediaUrl.startsWith('blob:') ? (
+                  <img
+                    src={msg.mediaUrl}
+                    alt="Media"
+                    className="rounded-lg max-w-full h-auto"
+                  />
+                ) : (
+                  <Image
+                    src={msg.mediaUrl}
+                    alt="Media"
+                    width={100}
+                    height={100}
+                    className="rounded-lg"
+                  />
+                )
               ) : msg.mediaType?.startsWith('video') ? (
                 <video controls className="rounded-lg max-w-full h-auto">
                   <source src={msg.mediaUrl} type={msg.mediaType} />

@@ -4,7 +4,7 @@
   "description": "",
   "license": "ISC",
   "author": "dhrup-sinha",
-  "type": "module",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "build": "tsc -b && cp -r ./src/generated ./dist/generated",

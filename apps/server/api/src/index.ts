@@ -42,6 +42,6 @@ app.use('/api/delete', deleteRoutes);
 setupSocket(server);
 
 // Start server
-server.listen(PORT, () => {
+server.listen(PORT, '192.168.1.8', () => {
   console.log(`🚀 Server + socket.io is listening on PORT http://${PORT}`);
 });

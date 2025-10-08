@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Image from 'next/image';
 
 interface UserProfile {
+  id: string;
   name: string;
   bio: string;
-  profileUrl?: string; // optional
+  profileUrl: string; // optional
 }
 
 export default function ProfilePage() {
@@ -37,9 +39,11 @@ export default function ProfilePage() {
       <h1 className="text-2xl font-bold mb-4">My Profile</h1>
 
       {user.profileUrl && (
-        <img
+        <Image
           src={user.profileUrl}
           alt="Profile"
+          width={48}
+          height={48}
           className="w-32 h-32 rounded-full mb-4 object-cover"
         />
       )}

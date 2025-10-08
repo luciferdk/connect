@@ -1,7 +1,6 @@
 // utils/axiosConfig.ts
 
 import axios from 'axios';
-import HomePage from '../pages/HomePage';
 
 // Create axios instance with cookie support
 const axiosInstance = axios.create({

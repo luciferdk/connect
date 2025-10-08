@@ -1,8 +1,10 @@
+//app/pages/HomePage/page.tsx
+
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '../../utils/userAuthStore';
 import axiosInstance from '../../utils/axiosConfig';
+import type { AxiosError } from 'axios';
 
 export default function HomePage() {
   const router = useRouter();
@@ -11,54 +13,64 @@ export default function HomePage() {
   const [otp, setOtp] = useState('');
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const handleSendOtp = async () => {
-    if (!mobile) return alert('Please enter your mobile number');
+    if (!mobile) return setMessage({ type: 'error', text: 'Please enter your mobile number' });
 
     try {
       await axiosInstance.post('/api/auth/authentication', { mobile });
       setStep('otp');
-    } catch (err: any) {
+      setMessage({ type: 'success', text: 'OTP sent successfully!' });
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message?: string }>;
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to send OTP');
+      setMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to send OTP',
+      });
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp) return alert('Please enter OTP');
+    if (!otp) return setMessage({ type: 'error', text: 'Please enter OTP' });
 
     try {
-      const res = await axiosInstance.post('/api/auth/authentication', {
-        mobile,
-        otp,
-      });
+      const res = await axiosInstance.post('/api/auth/authentication', { mobile, otp });
       if (res.status === 200) {
-        alert('Login successful!');
+        setMessage({ type: 'success', text: 'Login successful!' });
         router.push('/');
       }
-    } catch (err: any) {
-      if (err.response?.status === 404) setStep('details');
-      else if (err.response?.status === 401) alert('Invalid or expired OTP');
-      else console.error(err);
+    } catch (error: unknown) {
+      const err = error as AxiosError;
+      if (err.response?.status === 404) {
+        setStep('details');
+        setMessage({ type: 'error', text: 'User not found. Please register.' });
+      } else if (err.response?.status === 401) {
+        setMessage({ type: 'error', text: 'Invalid or expired OTP' });
+      } else {
+        console.error(err);
+        setMessage({ type: 'error', text: 'OTP verification failed' });
+      }
     }
   };
 
   const handleRegister = async () => {
-    if (!name) return alert('Please enter your name');
+    if (!name) return setMessage({ type: 'error', text: 'Please enter your name' });
 
     try {
-      const res = await axiosInstance.post('/api/auth/register', {
-        mobile,
-        name,
-        bio,
-      });
+      const res = await axiosInstance.post('/api/auth/register', { mobile, name, bio });
       if (res.status === 201) {
-        alert('Registration successful! You are logged in.');
+        setMessage({ type: 'success', text: 'Registration successful! You are logged in.' });
         router.push('/');
       }
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message?: string }>;
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to register');
+      setMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to register',
+      });
     }
   };
 
@@ -70,6 +82,17 @@ export default function HomePage() {
           {step === 'otp' && 'Enter OTP'}
           {step === 'details' && 'Complete Registration'}
         </h1>
+
+        {/* Message Display */}
+        {message && (
+          <div
+            className={`text-center mb-4 font-medium ${
+              message.type === 'success' ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
 
         {step === 'mobile' && (
           <div className="flex flex-col gap-4">
