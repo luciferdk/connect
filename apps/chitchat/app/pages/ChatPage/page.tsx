@@ -1,6 +1,5 @@
 // app/chat/page.tsx
 
-
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -8,6 +7,10 @@ import { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import ChatWindow from '../../components/ChatWindow';
 import axiosInstance from '../../utils/axiosConfig';
+
+
+
+
 
 export default function ChatPage() {
   const router = useRouter();
@@ -20,7 +23,7 @@ export default function ChatPage() {
       try {
         const res = await axiosInstance.get('/api/auth/check');
         setCurrentUser(res.data.user);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to load user Info', err);
       }
     }

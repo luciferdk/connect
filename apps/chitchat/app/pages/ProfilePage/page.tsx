@@ -20,7 +20,8 @@ export default function ProfilePage() {
       try {
         const res = await axios.get('/api/user', { withCredentials: true });
         setUser(res.data);
-      } catch (error) {
+      } catch (error: unknown) {
+
         console.error('Failed to fetch user:', error);
       } finally {
         setLoading(false);

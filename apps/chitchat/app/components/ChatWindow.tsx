@@ -40,7 +40,7 @@ export default function ChatWindow({
       try {
         const res = await axiosInstance.get(`/api/messages/${otherUserId}`);
         setMessages(res.data);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to fetch messages', err);
       }
     }
@@ -120,7 +120,7 @@ export default function ChatWindow({
 
       setNewMessage('');
       setFile(null);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to send message', err);
     }
   };
@@ -146,10 +146,12 @@ export default function ChatWindow({
             {msg.mediaUrl ? (
               msg.mediaType?.startsWith('image') ? (
                 msg.mediaUrl.startsWith('blob:') ? (
-                  <img
+                  <Image
                     src={msg.mediaUrl}
                     alt="Media"
-                    className="rounded-lg max-w-full h-auto"
+                    width={100}
+                    height={100}
+                    className="rounded-lg"
                   />
                 ) : (
                   <Image

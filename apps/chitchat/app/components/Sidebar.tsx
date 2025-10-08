@@ -3,6 +3,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import axiosInstance from '../utils/axiosConfig';
+import { logoutUser } from '../utils/logoutUser';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -33,18 +34,19 @@ export default function UserSidebar({
 }) {
   const [data, setData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userImgSrc, setUserImgSrc] = useState(
-    'https://placehold.co/150x150/1f2937/d1d5db?text=User'
+    'https://placehold.co/150x150/1f2937/d1d5db?text=User',
   );
-  const [imageErrorMap, setImageErrorMap] = useState<{ [id: string]: boolean }>({});
+  const [imageErrorMap, setImageErrorMap] = useState<{ [id: string]: boolean }>(
+    {},
+  );
 
   const API_ENDPOINT = '/api/messages/users';
   const router = useRouter();
 
-  const gotToProfilePage = () => {
-    router.push('../../pages/ProfilePage');
-  };
+  const toggleMenu = () => setMenuOpen(!menuOpen);
 
   useEffect(() => {
     async function fetchData() {
@@ -90,7 +92,9 @@ export default function UserSidebar({
           height={48}
           className="w-12 h-12 rounded-full object-cover border-2 border-blue-500"
           onError={() =>
-            setUserImgSrc('https://placehold.co/150x150/1f2937/d1d5db?text=User')
+            setUserImgSrc(
+              'https://placehold.co/150x150/1f2937/d1d5db?text=User',
+            )
           }
         />
 
@@ -98,11 +102,35 @@ export default function UserSidebar({
           <h2 className="text-lg font-bold truncate">{data?.user.name}</h2>
 
           <button
-            onClick={gotToProfilePage}
+            onClick={toggleMenu}
             className="text-sm text-blue-400 hover:bg-gray-400 activity:bg-gray-400 bg-gray-700 rounded-full p-2"
           >
             My Profile
           </button>
+
+          {menuOpen && (
+            <ul
+              className="absolute top-[17] right-[-120] md:right-[-205] lg:right-[-45] m-2 w-40 sm:w-48 bg-gray-800 rounded-xl shadow-lg ring-1 ring-gray-700 z-50
+                 text-gray-200 divide-y divide-gray-700"
+            >
+              <li>
+                <button
+                  onClick={() => router.push('/ProfilePage')}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-700 active:bg-gray-600 transition-colors duration-200"
+                >
+                  View Profile
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => logoutUser(router)}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-700 active:bg-gray-600 transition-colors duration-200"
+                >
+                  Logout
+                </button>
+              </li>
+            </ul>
+          )}
         </div>
       </div>
 
@@ -132,7 +160,10 @@ export default function UserSidebar({
                     height={48}
                     className="w-10 h-10 rounded-full object-cover"
                     onError={() =>
-                      setImageErrorMap((prev) => ({ ...prev, [contact.id]: true }))
+                      setImageErrorMap((prev) => ({
+                        ...prev,
+                        [contact.id]: true,
+                      }))
                     }
                   />
 

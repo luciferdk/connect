@@ -3,6 +3,15 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+interface ErrorsHai {
+  response?: {
+    data?: {
+      // Safest catch-all: allows string, number, boolean, null, object, or array
+      error?: string | number | boolean | object | null;
+    };
+  };
+}
+
 export default function UpdateProfile() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
@@ -27,8 +36,11 @@ export default function UpdateProfile() {
       });
 
       setMessage('Profile updated successfully!');
-    } catch (error: string) {
-      setMessage(error.response?.data?.error || 'Update failed');
+    } catch (error: unknown) {
+      const errorHai = error as ErrorsHai;
+      const rawError = errorHai.response?.data?.error;
+
+      setMessage(rawError? String(rawError): 'Update failed');
     }
   };
 
