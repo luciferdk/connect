@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-// ✅ Allow local network devices to connect in dev mode
-  experimental: {
-	  allowedDevOrigins: ['http://192.168.1.8:3000', 'http://192.168.1.8:8080'], // Your LAN IP here
-  },
-
+  // ✅ Allow local network devices to connect in dev mode
+  //allowedDevOrigins: ['10.54.158.144:3000', '10.54.158.144:8080'],
   images: {
     remotePatterns: [
       {
@@ -25,5 +22,4 @@ const nextConfig = {
     ],
   },
 };
-
-	export default nextConfig;
+export default nextConfig;

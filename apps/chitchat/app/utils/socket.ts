@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
 let socket: Socket | null = null;
 
 if (typeof window !== 'undefined') {
-  const socket = io('http://192.168.1.8:8080', {
+  socket = io('http://10.54.158.144:8080', {
     withCredentials: true,
     transports: ['websocket', 'polling'], //use websocket only
     autoConnect: false,

@@ -5,7 +5,7 @@ import axios from 'axios';
 // Create axios instance with cookie support
 const axiosInstance = axios.create({
   // ✅ Correct baseURL to the root of your API
-  baseURL: 'http://192.168.1.8:8080',
+  baseURL: 'http://10.54.158.144:8080',
   withCredentials: true,
 });
 

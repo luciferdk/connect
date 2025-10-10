@@ -12,6 +12,7 @@ interface MessagePayload {
   mediaBase64?: string;
   mediaType?: string;
 }
+
 interface Message {
   id: string;
   content?: string;
@@ -25,16 +26,24 @@ interface Message {
 export default function ChatWindow({
   currentUserId,
   otherUserId,
+  contactInfo,
 }: {
   currentUserId: string;
   otherUserId: string;
+  contactInfo: string;
+  contactInfo: {
+    nickname: string;
+    profileUrl: string;
+  };
 }) {
+  const [contactImgSrc, setContactImgSrc] = useState(contactInfo.profileUrl);
   const [messages, setMessages] = useState<Message[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [newMessage, setNewMessage] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Load chat history
+  //-------------------------Load chat history-------------------------------
   useEffect(() => {
     async function fetchMessages() {
       try {
@@ -47,34 +56,67 @@ export default function ChatWindow({
     fetchMessages();
   }, [otherUserId]);
 
-  // Socket listeners
+  //----------------------Socket connection check------------------------------
   useEffect(() => {
-    if (!socket) return;
-    socket.connect();
-    socket.emit('join', currentUserId);
-    socket.on('receive_message', (msg: Message) => {
+    if (!socket) {
+      console.error('Socket is not available');
+      return;
+    }
+
+    //-----------------------Connection event handlers-------------------------
+    const handleConnect = () => {
+      console.log('Socket connected');
+      setIsConnected(true);
+      socket.emit('join', currentUserId);
+    };
+
+    const handleDisconnect = () => {
+      console.log('Socket disconnected');
+      setIsConnected(false);
+    };
+
+    const handleConnectError = (error: Error) => {
+      console.error('Socket connection error:', error);
+      setIsConnected(false);
+    };
+
+    const handleReceiveMessage = (msg: Message) => {
+      console.log('Received message:', msg);
       if (
         (msg.senderId === otherUserId && msg.recipientId === currentUserId) ||
         (msg.senderId === currentUserId && msg.recipientId === otherUserId)
       ) {
         setMessages((prev) => [...prev, msg]);
       }
-    });
+    };
 
+    // Add event listeners
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+    socket.on('connect_error', handleConnectError);
+    socket.on('receive_message', handleReceiveMessage);
+
+    // Connect the socket
+    socket.connect();
+
+    // Cleanup
     return () => {
-    if(socket) {
-      socket.disconnect();
-      socket.off('receive_message');
+      if (socket) {
+        socket.off('connect', handleConnect);
+        socket.off('disconnect', handleDisconnect);
+        socket.off('connect_error', handleConnectError);
+        socket.off('receive_message', handleReceiveMessage);
+        socket.disconnect();
       }
     };
   }, [currentUserId, otherUserId]);
 
-  // Auto-scroll
+  //--------------------Auto-scroll-------------------------------
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Convert file to base64
+  //-----------------  ----Convert file to base64---------------------
   const toBase64 = (file: File) =>
     new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -83,9 +125,13 @@ export default function ChatWindow({
       reader.onerror = (error) => reject(error);
     });
 
-  // Send text/file
+  //-----------------Send text/file/audio,video/image to someOne----------------
   const send = async () => {
     if (!newMessage.trim() && !file) return;
+    if (!socket || !isConnected) {
+      console.error('Socket not connected');
+      return;
+    }
 
     const tempMsg: Message = {
       id: `temp~${Date.now()}`,
@@ -116,17 +162,17 @@ export default function ChatWindow({
         prev.map((m) => (m.id === tempMsg.id ? res.data : m)),
       );
 
-      if (socket) {
-        socket.emit('send_message', {
-          recipientId: otherUserId,
-          message: res.data,
-        });
-      }
+      socket.emit('send_message', {
+        recipientId: otherUserId,
+        message: res.data,
+      });
 
       setNewMessage('');
       setFile(null);
     } catch (err: unknown) {
       console.error('Failed to send message', err);
+      // Remove the temporary message if sending failed
+      setMessages((prev) => prev.filter((m) => m.id !== tempMsg.id));
     }
   };
 
@@ -134,7 +180,35 @@ export default function ChatWindow({
     <div className="flex flex-col h-screen w-full bg-gray-900 text-white">
       {/* Chat Header */}
       <div className="p-4 border-b border-gray-700 flex items-center justify-between bg-gray-800">
-        <h2 className="text-lg font-semibold truncate">Chat</h2>
+        <button className="flex items-center space-x-3">
+          {/* Contact Profile Image */}
+          <Image
+            src={contactImgSrc}
+            alt={contactInfo.nickname}
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full object-cover border-2 border-blue-500"
+            onError={() =>
+              setContactImgSrc(
+                'https://placehold.co/150x150/1f2937/d1d5db?text=User',
+              )
+            }
+          />
+
+          {/* Contact Name and Bio */}
+          <div className="flex flex-col">
+            <h2 className="text-lg font-semibold truncate">
+              {contactInfo.nickname}
+            </h2>
+            <p className="text-xs text-gray-400 truncate max-w-[200px]">
+              {contactInfo.bio || 'Online 1hr ago'}
+            </p>
+          </div>
+        </button>
+        <div
+          className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
+          title={isConnected ? 'Connected' : 'Disconnected'}
+        />
       </div>
 
       {/* Chat Messages */}
@@ -150,23 +224,14 @@ export default function ChatWindow({
           >
             {msg.mediaUrl ? (
               msg.mediaType?.startsWith('image') ? (
-                msg.mediaUrl.startsWith('blob:') ? (
-                  <Image
-                    src={msg.mediaUrl}
-                    alt="Media"
-                    width={100}
-                    height={100}
-                    className="rounded-lg"
-                  />
-                ) : (
-                  <Image
-                    src={msg.mediaUrl}
-                    alt="Media"
-                    width={100}
-                    height={100}
-                    className="rounded-lg"
-                  />
-                )
+                <Image
+                  src={msg.mediaUrl}
+                  alt="Media"
+                  width={100}
+                  height={100}
+                  className="rounded-lg"
+                  unoptimized={msg.mediaUrl.startsWith('blob:')}
+                />
               ) : msg.mediaType?.startsWith('video') ? (
                 <video controls className="rounded-lg max-w-full h-auto">
                   <source src={msg.mediaUrl} type={msg.mediaType} />
@@ -223,7 +288,8 @@ export default function ChatWindow({
           <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
+            placeholder={isConnected ? 'Type a message...' : 'Connecting...'}
+            disabled={!isConnected}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -231,13 +297,13 @@ export default function ChatWindow({
               }
             }}
             rows={1}
-            className="flex-1 resize-none bg-transparent text-gray-100 placeholder-gray-500 text-sm sm:text-base focus:outline-none overflow-hidden"
+            className="flex-1 resize-none bg-transparent text-gray-100 placeholder-gray-500 text-sm sm:text-base focus:outline-none overflow-hidden disabled:opacity-50"
           />
 
           {/* Send Button */}
           <button
             onClick={send}
-            className="ml-2 bg-blue-600 hover:bg-blue-700 text-white p-2 sm:px-3 sm:py-2 rounded-full shadow-md transition-all active:scale-95"
+            className="ml-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-2 sm:px-3 sm:py-2 rounded-full shadow-md transition-all active:scale-95"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

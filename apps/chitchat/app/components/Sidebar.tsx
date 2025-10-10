@@ -30,12 +30,16 @@ interface UserData {
 export default function UserSidebar({
   onSelect,
 }: {
-  onSelect: (id: string) => void;
+  onSelect: (contact: {
+    id: string;
+    nickName: string;
+    profileUrl: string;
+  }) => void;
 }) {
+  const [error, setError] = useState('');
   const [data, setData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [userImgSrc, setUserImgSrc] = useState(
     'https://placehold.co/150x150/1f2937/d1d5db?text=User',
   );
@@ -48,6 +52,7 @@ export default function UserSidebar({
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
+  // featch user data
   useEffect(() => {
     async function fetchData() {
       try {
@@ -82,7 +87,7 @@ export default function UserSidebar({
     );
 
   return (
-    <div className="w-80 h-full bg-gray-800 text-white flex flex-col">
+    <div className="sm:w-[19rem] w-[20rem] h-full bg-gray-800 text-white flex flex-col">
       {/* User Profile */}
       <div className="pl-[80px] pt-4 pb-4 pr-4 md:p-4 border-b border-gray-700 flex items-center space-x-4">
         <Image
@@ -92,7 +97,9 @@ export default function UserSidebar({
           height={48}
           className="w-12 h-12 rounded-full object-cover border-2 border-blue-500"
           onError={() =>
-            setUserImgSrc('https://placehold.co/150x150/1f2937/d1d5db?text=User')
+            setUserImgSrc(
+              'https://placehold.co/150x150/1f2937/d1d5db?text=User',
+            )
           }
         />
 
@@ -108,7 +115,7 @@ export default function UserSidebar({
 
           {menuOpen && (
             <ul
-              className="absolute top-[17] right-[-120] md:right-[-205] lg:right-[-45] m-2 w-40 sm:w-48 bg-gray-800 rounded-xl shadow-lg ring-1 ring-gray-700 z-50
+              className="absolute top-[17] right-[-120] md:right-[-85] lg:right-[-85] m-2 w-40 sm:w-48 bg-gray-800 rounded-xl shadow-lg ring-1 ring-gray-700 z-50
                  text-gray-200 divide-y divide-gray-700"
             >
               <li>
@@ -117,6 +124,14 @@ export default function UserSidebar({
                   className="block w-full text-left px-4 py-2 hover:bg-gray-700 active:bg-gray-600 transition-colors duration-200"
                 >
                   View Profile
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => router.push('../pages/SaveContact')}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-700 active:bg-gray-600 transition-colors durtion-200"
+                >
+                  + Add Contact
                 </button>
               </li>
               <li>
@@ -148,8 +163,14 @@ export default function UserSidebar({
               return (
                 <li
                   key={contact.id}
-                  onClick={() => onSelect(contact.id)}
-                  className="flex items-center space-x-3 p-2 hover:bg-gray-700 rounded-xl transition cursor-pointer"
+                  onClick={() =>
+                    onSelect({
+                      id: contact.id,
+                      nickname: contact.nickname,
+                      profileUrl: contact.profileUrl,
+                    })
+                  }
+                  className="flex items-center space-x-3 p-2 border-b hover:bg-gray-700 rounded-xl transition cursor-pointer"
                 >
                   <Image
                     src={imgSrc}

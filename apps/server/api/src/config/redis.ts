@@ -2,7 +2,8 @@ import { createClient, RedisClientType } from 'redis'; // Import RedisClientType
 
 // Create and export the redis client instance
 export const redisClient: RedisClientType = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379', // Use an environment variable for the Redis URL
+  url: process.env.REDIS_URL, // Use an environment variable for the Redis URL
+  // url: process.env.REDIS_URL || 'redis://localhost:6379', 
 });
 
 //------- hendale connection ------------//
