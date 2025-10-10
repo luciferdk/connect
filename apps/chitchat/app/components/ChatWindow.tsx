@@ -49,6 +49,7 @@ export default function ChatWindow({
 
   // Socket listeners
   useEffect(() => {
+    if (!socket) return;
     socket.connect();
     socket.emit('join', currentUserId);
     socket.on('receive_message', (msg: Message) => {
@@ -61,8 +62,10 @@ export default function ChatWindow({
     });
 
     return () => {
+    if(socket) {
       socket.disconnect();
       socket.off('receive_message');
+      }
     };
   }, [currentUserId, otherUserId]);
 
@@ -113,10 +116,12 @@ export default function ChatWindow({
         prev.map((m) => (m.id === tempMsg.id ? res.data : m)),
       );
 
-      socket.emit('send_message', {
-        recipientId: otherUserId,
-        message: res.data,
-      });
+      if (socket) {
+        socket.emit('send_message', {
+          recipientId: otherUserId,
+          message: res.data,
+        });
+      }
 
       setNewMessage('');
       setFile(null);

@@ -92,9 +92,7 @@ export default function UserSidebar({
           height={48}
           className="w-12 h-12 rounded-full object-cover border-2 border-blue-500"
           onError={() =>
-            setUserImgSrc(
-              'https://placehold.co/150x150/1f2937/d1d5db?text=User',
-            )
+            setUserImgSrc('https://placehold.co/150x150/1f2937/d1d5db?text=User')
           }
         />
 
