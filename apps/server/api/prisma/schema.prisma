@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String  @id @default(uuid())
+  name       String
+  mobile     String  @unique
+  bio        String?
+  profileUrl String?
+
+  // 👇 New opposite relation fields:
+  groupsAdministered Group[]       @relation("GroupAdmin")
+  groupMemberships   GroupMember[]
+
+  contacts   Contact[] @relation("UserContacts")
+  inContacts Contact[] @relation("AsContact")
+
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+}
+
+model Contact {
+  id        String @id @default(uuid())
+  ownerId   String  // User who owns this contact
+  contactId String  // The user being added as contact
+  nickName  String? //NickName set by owner
+
+  owner   User @relation("UserContacts", fields: [ownerId], references: [id])
+  contact User @relation("AsContact", fields: [contactId], references: [id])
+
+  @@unique([ownerId, contactId]) // No duplicate contacts
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  senderId    String
+  recipientId String
+  content     String?
+  mediaUrl    String?
+  mediaType   String? // image, video, doc, audio
+  timestamp   DateTime @default(now())
+  groupId     String?
+
+  sender    User @relation("SentMessages", fields: [senderId], references: [id])
+  recipient User @relation("ReceivedMessages", fields: [recipientId], references: [id])
+
+  group Group? @relation(fields: [groupId], references: [id])
+}
+
+model Group {
+  id       String        @id @default(uuid())
+  name     String
+  adminId  String
+  admin    User          @relation("GroupAdmin", fields: [adminId], references: [id])
+  members  GroupMember[]
+  messages Message[]
+}
+
+model GroupMember {
+  id      String @id @default(uuid())
+  groupId String
+  userId  String
+
+  group Group @relation(fields: [groupId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
