@@ -3,7 +3,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import axiosInstance from '../../utils/axiosConfig';
+import axiosInstance from '../utils/axiosConfig';
 import type { AxiosError } from 'axios';
 
 export default function HomePage() {

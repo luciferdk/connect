@@ -1,7 +1,7 @@
 'use client';
 
 
-import ChatPage from './pages/ChatPage/page';
+import ChatPage from './ChatPage/page';
 import { Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -29,11 +29,11 @@ export default function Home() {
         if (res.status === 200) {
           setLoading(false);
         } else {
-          router.push('/pages/HomePage');
+          router.push('/HomePage');
         }
       } catch (error) {
         console.error('JWT Verification Faield:', error);
-        router.push('/pages/HomePage');
+        router.push('/HomePage');
       }
     };
     verifyToken();

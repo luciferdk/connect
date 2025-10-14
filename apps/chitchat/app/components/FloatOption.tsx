@@ -24,7 +24,7 @@ export default function FloatOption() {
         </li>
         <li>
           <button
-            onClick={() => router.push('/pages/SaveContact')}
+            onClick={() => router.push('/SaveContact')}
             className="block w-full text-left px-4 py-2 hover:bg-gray-700 active:bg-gray-600 transition-colors duration-200"
           >
             + Add Contact

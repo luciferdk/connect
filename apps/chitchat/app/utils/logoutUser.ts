@@ -16,7 +16,7 @@ export async function logoutUser(router: AppRouterInstance) {
     localStorage.removeItem('token');
 
     // Redirect to login page
-    router.push('../pages/HomePage');
+    router.push('/HomePage');
   } catch (error) {
     console.error('Logout failed:', error);
   }
