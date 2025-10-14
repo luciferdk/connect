@@ -1,13 +1,16 @@
 //app/pages/HomePage/page.tsx
 
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '../../utils/axiosConfig';
 import type { AxiosError } from 'axios';
 
 export default function HomePage() {
   const router = useRouter();
+
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [step, setStep] = useState<'mobile' | 'otp' | 'details'>('mobile');
   const [mobile, setMobile] = useState('');
   const [otp, setOtp] = useState('');
@@ -17,6 +20,34 @@ export default function HomePage() {
     type: 'success' | 'error';
     text: string;
   } | null>(null);
+
+  // ⏲️  Timer efect for resend button
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isButtonDisabled && step === 'otp') {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setIsButtonDisabled(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isButtonDisabled, step]);
+
+  // foramte the Time
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    const mm = m < 10 ? `0${m}` : m;
+    const ss = s < 10 ? `0${s}` : s;
+    return `${mm}:${ss}`;
+  };
 
   const handleSendOtp = async () => {
     if (!mobile)
@@ -29,6 +60,10 @@ export default function HomePage() {
       await axiosInstance.post('/api/auth/authentication', { mobile });
       setStep('otp');
       setMessage({ type: 'success', text: 'OTP sent successfully!' });
+
+      //Start 2-minute timer for  resend
+      setTimeLeft(60);
+      setIsButtonDisabled(true);
     } catch (error: unknown) {
       const err = error as AxiosError<{ message?: string }>;
       console.error(err);
@@ -62,6 +97,26 @@ export default function HomePage() {
         console.error(err);
         setMessage({ type: 'error', text: 'OTP verification failed' });
       }
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (isButtonDisabled) return; //prevent Spam Clicks
+
+    try {
+      await axiosInstance.post('/api/auth/authentication', { mobile });
+      setMessage({ type: 'success', text: 'OTP sent successfully!' });
+
+      // Restart timer after resend
+      setTimeLeft(60);
+      setIsButtonDisabled(true);
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message?: string }>;
+      console.error(err);
+      setMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to send OTP',
+      });
     }
   };
 
@@ -119,11 +174,11 @@ export default function HomePage() {
               placeholder="Mobile Number"
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
-              className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="text-gray-600 border-b bg-transparent focus:outline-none focus:border-indigo-600 rounded-lg px-4 py-2"
             />
             <button
               onClick={handleSendOtp}
-              className="bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
+              className="bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition active:text-red-200"
             >
               Send OTP
             </button>
@@ -134,6 +189,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-4">
             <input
               type="text"
+              pattern="\d{10}"
               placeholder="Enter OTP"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
@@ -141,9 +197,19 @@ export default function HomePage() {
             />
             <button
               onClick={handleVerifyOtp}
-              className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+	      disabled={!otp}
+              className={`py-2 rounded-lg transition ${otp ? 'bg-indigo-500 hover:bg-red-200 text-white' : 'bg-gray-400 cursor-not-allowed text-white' }`}
             >
               Verify OTP
+            </button>
+            <button
+              onClick={handleResendOtp}
+              disabled={isButtonDisabled}
+              className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+            >
+              {isButtonDisabled
+                ? `Re-Send in ${formatTime(timeLeft)}`
+                : 'rensend OTP'}
             </button>
           </div>
         )}
