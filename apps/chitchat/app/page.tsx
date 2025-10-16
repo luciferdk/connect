@@ -1,5 +1,6 @@
 'use client';
 
+export const dynamic = 'force-dynamic'
 
 import ChatPage from './ChatPage/page';
 import { Loader } from 'lucide-react';

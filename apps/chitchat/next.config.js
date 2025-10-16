@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ✅ Allow local network devices to connect in dev mode
-  //allowedDevOrigins: ['10.54.158.144:3000', '10.54.158.144:8080'],
   images: {
     remotePatterns: [
       {

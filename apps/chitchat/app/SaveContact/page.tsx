@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import axiosInstance from '/utils/axiosConfig';
+import axiosInstance from '../utils/axiosConfig';
 import { useRouter } from 'next/navigation';
 
 interface ApiError {

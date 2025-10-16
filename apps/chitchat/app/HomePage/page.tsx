@@ -1,6 +1,9 @@
 //app/pages/HomePage/page.tsx
 
 'use client';
+
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '../utils/axiosConfig';
@@ -151,9 +154,9 @@ export default function HomePage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 p-4">
       <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          {step === 'mobile' && 'Login with Mobile'}
-          {step === 'otp' && 'Enter OTP'}
-          {step === 'details' && 'Complete Registration'}
+          {step === 'mobile' ? 'Login with Mobile' :
+           step === 'otp' ? 'Enter OTP' :
+           step === 'details' ? 'Complete Registration' : 'Welcome'}
         </h1>
 
         {/* Message Display */}

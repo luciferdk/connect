@@ -2,19 +2,13 @@
 
 'use client';
 
-import dynamic from 'next/dynamic';
 import { ChatProvider } from '../context/ChatContext';
 import { useState } from 'react';
 import { useChat } from '../context/ChatContext';
+import SideBar from '../components/SideBar';
+import ChatWindow from '../components/ChatWindow';
 
-// Dynamic imports for client-side only components
-const SideBar = dynamic(() => import('../components/SideBar'), {
-  ssr: false,
-});
-
-const ChatWindow = dynamic(() => import('../components/ChatWindow'), {
-  ssr: false,
-});
+export const dynamic = 'force-dynamic'
 
 // Inner component that uses the ChatContext
 function ChatPageContent() {
