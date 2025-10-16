@@ -8,7 +8,6 @@ import { useChat } from '../context/ChatContext';
 import SideBar from '../components/SideBar';
 import ChatWindow from '../components/ChatWindow';
 
-export const dynamic = 'force-dynamic'
 
 // Inner component that uses the ChatContext
 function ChatPageContent() {
