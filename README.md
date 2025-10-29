@@ -2,14 +2,6 @@
 
 This Turborepo starter is maintained by the Turborepo core team.
 
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest
-```
-
 ## What's inside?
 
 This Turborepo includes the following packages/apps:
@@ -37,17 +29,26 @@ This Turborepo has some additional tools already setup for you:
 To build all apps and packages, run the following command:
 
 ```
-cd my-turborepo
-pnpm build
+cd connect
+turbo run build
 ```
-
+### Start Production level applicaiton
+```
+cd connect
+turbo run start
+```
+### For ESLint
+```
+cd connect
+turbo run lint
+```
 ### Develop
 
 To develop all apps and packages, run the following command:
 
 ```
-cd my-turborepo
-pnpm dev
+cd connect
+turbo run dev
 ```
 
 ### Remote Caching
