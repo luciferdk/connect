@@ -1,9 +1,7 @@
 'use client';
 
-export const dynamic = 'force-dynamic'
-
 import ChatPage from './ChatPage/page';
-import { Loader } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axiosInstance from './utils/axiosConfig';
@@ -13,14 +11,6 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    /* // Simulate loading time (you can replace this with actual data fetching)
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000); // 2 seconds loading time
-
-    return () => clearTimeout(timer);
-    */
-
     const verifyToken = async () => {
       try {
         const res = await axiosInstance.get('/api/auth/check', {
@@ -33,7 +23,7 @@ export default function Home() {
           router.push('/HomePage');
         }
       } catch (error) {
-        console.error('JWT Verification Faield:', error);
+        console.error('JWT Verification Failed:', error);
         router.push('/HomePage');
       }
     };
@@ -41,10 +31,12 @@ export default function Home() {
   }, [router]);
 
   if (loading) {
+    const SpinLoader = Loader2 as React.FC<React.SVGProps<SVGSVGElement>>;
+
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="flex flex-col items-center space-y-4">
-          <Loader className="w-8 h-8 animate-spin text-blue-600" />
+          <SpinLoader className="w-8 h-8 animate-spin text-blue-600" />
           <p className="text-gray-600 font-medium">L o a d i n g...</p>
         </div>
       </div>
