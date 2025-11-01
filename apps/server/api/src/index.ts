@@ -22,7 +22,7 @@ const app = express();
 const server = http.createServer(app);//Important: attach to server
 
 //middleware
-app.use(cors({ origin:  'http://192.168.1.14:3000', credentials: true }));
+app.use(cors({ origin:  'http://192.168.1.15:3000', credentials: true }));
 app.use(express.json({ limit: '100mb' }));
 app.use(cookieParser());
 
@@ -42,6 +42,6 @@ app.use('/api/delete', deleteRoutes);
 setupSocket(server);
 
 // Start server
-server.listen(PORT, '192.168.1.14', () => {
+server.listen(PORT, '192.168.1.15', () => {
   console.log(`🚀 Server + socket.io is listening on PORT http://${PORT}`);
 });

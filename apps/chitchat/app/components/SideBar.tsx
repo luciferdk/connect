@@ -24,6 +24,7 @@ interface UserData {
     name: string;
     profileUrl: string;
     bio: string;
+    mobile: string;
   };
   contacts: Contact[];
 }
@@ -35,7 +36,6 @@ interface SideBarProps {
 //----------------------------------
 export default function UserSideBar({ onSelect }: SideBarProps) {
   const { setSelectedContact, setCurrentUser } = useChat();
-
   const [error, setError] = useState('');
   const [data, setData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,10 +57,10 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
       try {
         const response = await axiosInstance.get(API_ENDPOINT);
         setData(response.data);
-	//console.log("Fetched messages raw:", response.data);
+        console.log(response.data);
+        //console.log("Fetched messages raw:", response.data);
         if (response.data?.user?.profileUrl) {
           setUserImgSrc(response.data.user.profileUrl);
-
         }
       } catch (err: unknown) {
         console.error('API call failed:', err);
@@ -105,6 +105,7 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
       nickName: contact.nickName,
       profileUrl: contact.profileUrl,
       bio: contact.bio,
+      mobile: contact.mobile,
     });
 
     // Call onSelect callback to close sidebar on mobile

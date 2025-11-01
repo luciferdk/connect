@@ -30,8 +30,12 @@ export const authentic = async (req: Request, res: Response): Promise<void> => {
   // Step 1 → Send OTP if no OTP provided
   if (!otp) {
     try {
-      const message = await sendOtp(mobile);
-      res.status(200).json({ message: `OTP sent to ${mobile}`, info: message });
+      const otpResponse = await sendOtp(mobile);
+      res.status(200).json({
+        message: `OTP sent to ${mobile}`,
+        otp: otpResponse.otp,
+        info: 'OTP sent Successfully',
+      });
       return;
     } catch (error) {
       console.error('OTP send error:', error);
@@ -117,5 +121,3 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 };
-
-

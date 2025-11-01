@@ -1,3 +1,5 @@
+// /context/ChatContext.tsx
+
 'use client';
 
 import { createContext, useContext, useState, ReactNode } from 'react';
@@ -7,6 +9,7 @@ interface Contact {
   nickName: string;
   profileUrl: string;
   bio: string;
+  mobile: string;
 }
 interface User {
   id: string;

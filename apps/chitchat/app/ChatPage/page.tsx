@@ -2,7 +2,6 @@
 
 'use client';
 
-import { ChatProvider } from '../context/ChatContext';
 import { useState } from 'react';
 import { useChat } from '../context/ChatContext';
 import SideBar from '../components/SideBar';
@@ -10,7 +9,7 @@ import ChatWindow from '../components/ChatWindow';
 
 
 // Inner component that uses the ChatContext
-function ChatPageContent() {
+export default function ChatPage() {
   const { selectedContact, currentUser } = useChat();
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
 
@@ -69,11 +68,4 @@ function ChatPageContent() {
   );
 }
 
-// Main page component that wraps everything with ChatProvider
-export default function ChatPage() {
-  return (
-    <ChatProvider>
-      <ChatPageContent />
-    </ChatProvider>
-  );
-}
+

@@ -47,7 +47,7 @@ export default function AddContactPage() {
 
       setNickName('');
       setMobile('');
-      setTimeout(() => router.push('/pages/ChatPage'), 1200);
+      setTimeout(() => router.push('/ChatPage'), 1200);
     } catch (err: unknown) {
       console.error('Error saving contact:', err);
       const apiError = err as ApiError;

@@ -4,10 +4,12 @@ dotenv.config();
 import { redisClient } from './redis';
 import { generateOTP } from '../utils/generateOtp';
 
+interface OtpResponse {
+  otp: string;
+}
 
 // ----------generating otp and sending to user phone-------------------//
-export const sendOtp = async (mobile: string): Promise<void> => {
-
+export const sendOtp = async (mobile: string): Promise<OtpResponse> => {
   //validate 10-digit mobile number
   const isValid = /^[6-9]\d{9}$/.test(mobile);
   if (!isValid) {
@@ -22,7 +24,7 @@ export const sendOtp = async (mobile: string): Promise<void> => {
   try {
     // Store OTP in Redis
     await redisClient.setEx(`otp:${mobile}`, 300, otp); //expire in 5 min
-    console.log(otp);
+    //console.log(otp);
     /*
 //send otp on user mobile
 console.log('API KEY:', process.env.FAST2SMS_API_KEY);
@@ -43,7 +45,9 @@ console.log('API KEY:', process.env.FAST2SMS_API_KEY);
     );
     //console.log('FASAT2SMS Response:', response.data);
     */
-   return;
+    return {
+      otp: otp,
+    };
   } catch (error) {
     console.error('otp error', error);
     throw error;

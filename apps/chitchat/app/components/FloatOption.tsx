@@ -11,7 +11,7 @@ export default function FloatOption() {
   return (
     <div>
       <ul
-        className="absolute top-[17px] right-[-120px] md:right-[-85px] lg:right-[-85px] m-2 w-40 sm:w-48 bg-gray-800 rounded-xl shadow-lg ring-1 ring-gray-700 z-50
+        className="absolute top-[17px] right-[-120px] md:right-[-154px] lg:right-[-160px] m-2 w-40 sm:w-48 bg-gray-800 rounded-xl shadow-lg ring-1 ring-gray-700 z-50
                  text-gray-200 divide-y divide-gray-700"
       >
         <li>
