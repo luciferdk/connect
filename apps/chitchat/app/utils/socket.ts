@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
 let socket: Socket | null = null;
 
 if (typeof window !== 'undefined') {
-  socket = io('http://192.168.1.15:8080', {
+  socket = io(process.env.NEXT_PUBLIC_API_URL as string, {
     withCredentials: true,
     transports: ['websocket', 'polling'], //use websocket only
     autoConnect: false,
