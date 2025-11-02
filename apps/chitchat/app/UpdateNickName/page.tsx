@@ -42,7 +42,7 @@ export default function UpdateNickName() {
       setSelectedContact({ ...selectedContact, nickName: response.data.nickName });
       setSuccess('Nickname updated successfully');
       setTimeout( ()=> { router.push('/'); }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.response?.data?.message || 'Failed to update nickname');
     } finally {
       setLoading(false);
