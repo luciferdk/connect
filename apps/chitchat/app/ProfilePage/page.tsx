@@ -12,7 +12,6 @@ interface UserProfile {
   name: string;
   bio: string;
   profileUrl: string; // optional
-  mobile?: string; // Add mobile to match your context
 }
 
 export default function ProfilePage() {
@@ -31,7 +30,6 @@ const router = useRouter();
         name: currentUser.name,
         bio: currentUser.bio,
         profileUrl: currentUser.profileUrl,
-        mobile: currentUser.mobile,
       };
       setUser(userProfile);
     }
@@ -59,7 +57,6 @@ const router = useRouter();
 
       <p className="text-lg font-semibold">Name: {user.name}</p>
       <p className="text-gray-600">Bio: {user.bio}</p>
-      {user.mobile && <p className="text-gray-600">Mobile: {user.mobile}</p>}
       </div>
       <div>
       <UpdateProfile />

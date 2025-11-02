@@ -1,16 +1,14 @@
 // /app/components/UpdateNickName.tsx
 
-
 'use client';
 
 import { useState } from 'react';
 import { useChat } from '../context/ChatContext';
 import axiosInstance from '../utils/axiosConfig';
 import { useRouter } from 'next/navigation';
-
+import { AxiosError } from 'axios';
 
 export default function UpdateNickName() {
-  
   const router = useRouter();
 
   const { selectedContact, setSelectedContact } = useChat();
@@ -36,14 +34,23 @@ export default function UpdateNickName() {
       const response = await axiosInstance.put(
         '/api/profile/updateNickName',
         { mobile: selectedContact.mobile, nickName },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      setSelectedContact({ ...selectedContact, nickName: response.data.nickName });
+      setSelectedContact({
+        ...selectedContact,
+        nickName: response.data.nickName,
+      });
       setSuccess('Nickname updated successfully');
-      setTimeout( ()=> { router.push('/'); }, 2000);
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
     } catch (err: unknown) {
-      setError(err.response?.data?.message || 'Failed to update nickname');
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.message || 'Failed to update nickname');
+      } else {
+        setError('Failed to Update nickName');
+      }
     } finally {
       setLoading(false);
     }
