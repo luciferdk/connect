@@ -57,7 +57,7 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
       try {
         const response = await axiosInstance.get(API_ENDPOINT);
         setData(response.data);
-        console.log(response.data);
+        //console.log(response.data);
         //console.log("Fetched messages raw:", response.data);
         if (response.data?.user?.profileUrl) {
           setUserImgSrc(response.data.user.profileUrl);
@@ -115,7 +115,7 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
   };
 
   return (
-    <div className="sm:w-[19rem] w-[20rem] h-full bg-gray-800 text-white flex flex-col">
+    <div className="h-screen sm:w-[19rem] w-[20rem] h-full bg-gray-800 text-white flex flex-col">
       {/* User Profile */}
       <div className="pl-[80px] pt-4 pb-4 pr-4 md:p-4 border-b border-gray-700 flex items-center space-x-4">
         <Image

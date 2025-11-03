@@ -57,7 +57,7 @@ export default function UpdateNickName() {
   };
 
   return (
-    <div className="w-48 bg-gray-800 rounded-xl shadow-lg ring-1 ring-gray-700 text-gray-200 p-4 divide-y divide-gray-700">
+    <div className="w-80 bg-gray-800 rounded-xl shadow-lg ring-1 ring-gray-700 text-gray-200 p-4 divide-y divide-gray-700">
       <h3 className="text-white text-lg font-semibold mb-2">Update Nickname</h3>
       <input
         type="text"

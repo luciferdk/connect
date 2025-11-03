@@ -76,7 +76,7 @@ export default function ChatWindow() {
               }
             />
             <div className="flex flex-col">
-              <h2 className="text-lg font-semibold truncate">
+              <h2 className="self-start text-lg font-semibold truncate">
                 {selectedContact.nickName}
               </h2>
               <p className="text-xs text-gray-400 truncate max-w-[200px]">
