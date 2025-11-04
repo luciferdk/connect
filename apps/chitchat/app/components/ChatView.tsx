@@ -156,7 +156,7 @@ export default function ChatView({
           messages.map((msg) => (
             <div
               key={msg.id}
-              className={`w-fit max-w-[80%] md:max-w-[70%] lg:max-w-[60%] p-3 rounded-2xl break-words shadow-sm ${
+              className={`w-fit max-w-[80%] md:max-w-[70%] lg:max-w-[60%] p-3 rounded-2xl break-words break-all overflow-hidden text-wrap shadow-sm whitespace-pre-wrap ${
                 msg.senderId === currentUserId
                   ? 'bg-blue-600 text-white self-end ml-auto'
                   : 'bg-gray-700 text-gray-100 self-start mr-auto'
