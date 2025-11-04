@@ -9,6 +9,9 @@ if (typeof window !== 'undefined') {
     withCredentials: true,
     transports: ['websocket', 'polling'], //use websocket only
     autoConnect: false,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDely: 1000,
   });
 }
 

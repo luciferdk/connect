@@ -15,7 +15,7 @@ export default function ChatWindow() {
     selectedContact?.profileUrl ||
       'https://placehold.co/150x150/1f2937/d1d5db?text=User',
   );
-  const [isConnected, setIsConnected] = useState(false);
+  const [isContactOnline, setIsContactOnline] = useState(false);
 
   const toggleRef = useRef<HTMLDivElement>(null);
 
@@ -96,13 +96,13 @@ export default function ChatWindow() {
         {/* Connection Status */}
         <div className="flex items-center space-x-2">
           <span
-            className={`text-xs ${isConnected ? 'text-green-400' : 'text-red-400'}`}
+            className={`text-xs ${isContactOnline ? 'text-green-400' : 'text-red-400'}`}
           >
-            {isConnected ? 'Connected' : 'Disconnected'}
+            {isContactOnline ? 'Online' : 'Offline'}
           </span>
           <div
-            className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
-            title={isConnected ? 'Connected' : 'Disconnected'}
+            className={`w-3 h-3 rounded-full ${isContactOnline ? 'bg-green-500' : 'bg-red-500'}`}
+            title={isContactOnline ? 'Online' : 'Offline'}
           />
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function ChatWindow() {
       <ChatView
         selectedContact={selectedContact}
         currentUser={currentUser}
-        onConnectionChange={setIsConnected}
+        onConnectionChange={setIsContactOnline}
       />
     </div>
   );

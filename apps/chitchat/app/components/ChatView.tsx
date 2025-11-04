@@ -42,6 +42,7 @@ export default function ChatView({
 }: ChatViewProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isContactOnline, setIsContactOnline] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const currentUserId = currentUser?.id || '';
@@ -62,7 +63,7 @@ export default function ChatView({
     fetchMessages();
   }, [otherUserId]);
 
-  //----------------------Socket connection check------------------------------
+  //----------------------⚡Socket connection check------------------------------
   useEffect(() => {
     if (!socket || !currentUserId) {
       console.error('Socket is not available or user not logged in');
@@ -73,20 +74,17 @@ export default function ChatView({
     const handleConnect = () => {
       console.log('Socket connected');
       setIsConnected(true);
-      onConnectionChange(true);
       socket?.emit('join', currentUserId);
     };
 
     const handleDisconnect = () => {
       console.log('Socket disconnected');
       setIsConnected(false);
-      onConnectionChange(false);
     };
 
     const handleConnectError = (error: Error) => {
       console.error('Socket connection error:', error);
       setIsConnected(false);
-      onConnectionChange(false);
     };
 
     const handleReceiveMessage = (msg: Message) => {
@@ -99,11 +97,29 @@ export default function ChatView({
       }
     };
 
-    // Add event listeners
+    // listen for online/offline events
+    const handleUserOnline = (userId: string) => {
+      if (userId === otherUserId) setIsContactOnline(true);
+    };
+
+    const handleUserOffline = (userId: string) => {
+      if (userId === otherUserId) {
+      setTimeout(() => setIsContactOnline(false), 3000);
+      }
+    };
+
+    const handleOnlineUsers = (users: string[]) => {
+      setIsContactOnline(users.includes(otherUserId));
+    };
+
+    // Socket event listeners
     socket.on('connect', handleConnect);
     socket.on('disconnect', handleDisconnect);
     socket.on('connect_error', handleConnectError);
     socket.on('receive_message', handleReceiveMessage);
+    socket.on('user_online', handleUserOnline);
+    socket.on('user_offline', handleUserOffline);
+    socket.on('online_users', handleOnlineUsers);
 
     // Connect the socket
     socket.connect();
@@ -115,6 +131,9 @@ export default function ChatView({
         socket.off('disconnect', handleDisconnect);
         socket.off('connect_error', handleConnectError);
         socket.off('receive_message', handleReceiveMessage);
+        socket.off('user_online', handleUserOnline);
+        socket.off('user_offline', handleUserOffline);
+        socket.off('online_users', handleOnlineUsers);
         socket.disconnect();
       }
     };
@@ -137,6 +156,11 @@ export default function ChatView({
   const removeTempMessage = (tempId: string) => {
     setMessages((prev) => prev.filter((m) => m.id !== tempId));
   };
+
+  // This effect syncs contact online/offline state to ChatWindow
+  useEffect(() => {
+    onConnectionChange(isContactOnline);
+  }, [isContactOnline, onConnectionChange]);
 
   return (
     <div className="h-screen-dvh flex flex-col flex-1 overflow-hidden">
