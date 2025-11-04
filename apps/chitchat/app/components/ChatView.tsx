@@ -104,7 +104,7 @@ export default function ChatView({
 
     const handleUserOffline = (userId: string) => {
       if (userId === otherUserId) {
-      setTimeout(() => setIsContactOnline(false), 3000);
+        setTimeout(() => setIsContactOnline(false), 3000);
       }
     };
 
@@ -157,7 +157,7 @@ export default function ChatView({
     setMessages((prev) => prev.filter((m) => m.id !== tempId));
   };
 
-  // This effect syncs contact online/offline state to ChatWindow
+  // ---------------- Sync status ----------------
   useEffect(() => {
     onConnectionChange(isContactOnline);
   }, [isContactOnline, onConnectionChange]);
