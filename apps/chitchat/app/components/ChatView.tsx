@@ -139,7 +139,7 @@ export default function ChatView({
   };
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
+    <div className="h-screen-dvh flex flex-col flex-1 overflow-hidden">
       {/* Chat Messages Display */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-900 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
         {messages.length === 0 ? (

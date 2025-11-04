@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* --- Mobile viewport stability fix --- */
+
+/* globals.css */
+
+html,
+body {
+  height: 100%;
+  overscroll-behavior-y: contain; /* prevent scroll bounce */
+}
+
+@supports (height: 100dvh) {
+  .h-screen-dvh {
+    height: 100dvh;
+  }
+}
+
+@supports not (height: 100dvh) {
+  .h-screen-dvh {
+    height: 100vh;
+  }
+}

@@ -87,14 +87,14 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-900 text-gray-100">
+      <div className="flex items-center justify-center h-screen-dvh bg-gray-900 text-gray-100">
         <p>Loading...</p>
       </div>
     );
 
   if (error)
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-900 text-red-400">
+      <div className="flex items-center justify-center h-screen-dvh bg-gray-900 text-red-400">
         <p>Error: Failed to fetch data.</p>
       </div>
     );
@@ -115,7 +115,7 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
   };
 
   return (
-    <div className="h-screen sm:w-[19rem] w-[20rem] h-full bg-gray-800 text-white flex flex-col">
+    <div className="h-screen-dvh sm:w-[19rem] w-[20rem] h-full bg-gray-800 text-white flex flex-col">
       {/* User Profile */}
       <div className="pl-[80px] pt-4 pb-4 pr-4 md:p-4 border-b border-gray-700 flex items-center space-x-4">
         <Image

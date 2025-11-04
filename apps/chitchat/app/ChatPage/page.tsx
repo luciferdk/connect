@@ -7,14 +7,13 @@ import { useChat } from '../context/ChatContext';
 import SideBar from '../components/SideBar';
 import ChatWindow from '../components/ChatWindow';
 
-
 // Inner component that uses the ChatContext
 export default function ChatPage() {
   const { selectedContact, currentUser } = useChat();
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen lg:pl-[400px] lg:pr-[400px] bg-gradient-to-br from-gray-50 via-purple-400 to-black relative overflow-hidden">
+    <div className="flex h-screen-dvh lg:pl-[400px] lg:pr-[400px] bg-gradient-to-br from-gray-50 via-purple-400 to-black relative overflow-hidden">
       {/* 📱 Mobile Sidebar Toggle */}
       <button
         onClick={() => setIsSideBarOpen(!isSideBarOpen)}
@@ -67,5 +66,3 @@ export default function ChatPage() {
     </div>
   );
 }
-
-

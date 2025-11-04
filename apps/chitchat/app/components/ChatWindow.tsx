@@ -42,7 +42,7 @@ export default function ChatWindow() {
 
   if (!selectedContact || !currentUser) {
     return (
-      <div className="flex items-center justify-center h-screen w-full bg-gray-900 text-gray-400">
+      <div className="flex items-center justify-center h-screen-dvh w-full bg-gray-900 text-gray-400">
         <div className="text-center">
           <h2 className="text-xl mb-2">Select a contact to start chatting</h2>
           <p className="text-sm">
@@ -54,7 +54,7 @@ export default function ChatWindow() {
   }
 
   return (
-    <div className="flex flex-col h-screen w-full bg-gray-900 text-white relative">
+    <div className="flex flex-col h-screen-dvh w-full bg-gray-900 text-white relative">
       {/* Chat Header */}
       <div className="p-4 border-b border-gray-700 flex items-center justify-between bg-gray-800 flex-shrink-0 relative">
         {/* Contact Button */}
