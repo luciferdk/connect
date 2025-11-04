@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') {
     autoConnect: false,
     reconnection: true,
     reconnectionAttempts: Infinity,
-    reconnectionDely: 1000,
+    reconnectionDelay: 1000,
   });
 }
 
