@@ -65,8 +65,8 @@ export default function UpdateProfile() {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h1 className="text-xl font-bold mb-4">Update Profile</h1>
+    <div className="flex justify-center flex-col p-3 max-w-md mx-auto">
+      <h1 className="text-xl text-center font-bold mb-4">Update Profile</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input

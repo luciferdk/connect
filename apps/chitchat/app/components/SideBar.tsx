@@ -140,13 +140,12 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
           >
             My Profile
           </button>
-
-          {menuOpen && <FloatOption />}
         </div>
       </div>
 
       {/* Contacts */}
       <div className="flex-1 overflow-y-auto p-2">
+        {menuOpen && <FloatOption />}
         <button className="block item-center p-2 text-sm hover:bg-sky-400 active:bg-sky-400 rounded-full bg-gray-700 m-2">
           Create group
         </button>
