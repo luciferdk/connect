@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import axiosInstance from '../utils/axiosConfig';
 import type { AxiosError } from 'axios';
 
@@ -164,41 +165,81 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 p-4">
-      <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          {step === 'mobile'
-            ? 'Login with Mobile'
-            : step === 'otp'
-              ? 'Enter OTP'
-              : step === 'details'
-                ? 'Complete Registration'
-                : 'Welcome'}
-        </h1>
+    <div
+      className="h-screen-dvh flex items-center justify-center p-4"
+      style={{
+        background: 'linear-gradient(135deg, #F5F7FA 0%, #c2c0b6 100%)',
+      }}
+    >
+      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md p-8 border border-gray-100">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <div
+            className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: '#1976D2' }}
+          >
+            <Image
+              src="/logo.svg"
+              alt="Connect company logo"
+              height={65}
+              width={65}
+              className="rounded-full "
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            {step === 'mobile'
+              ? 'Welcome Back'
+              : step === 'otp'
+                ? 'Verify OTP'
+                : 'Complete Profile'}
+          </h1>
+          <p className="text-gray-500 text-sm">
+            {step === 'mobile'
+              ? 'Enter your mobile number to continue'
+              : step === 'otp'
+                ? 'Enter the OTP sent to your mobile'
+                : 'Just a few more details'}
+          </p>
+        </div>
 
         {/* Message Display */}
         {message && (
           <div
-            className={`text-center mb-4 font-medium ${
-              message.type === 'success' ? 'text-green-600' : 'text-red-600'
+            className={`mb-6 p-4 rounded-lg text-sm font-medium text-center ${
+              message.type === 'success'
+                ? 'bg-green-50 border border-green-200'
+                : 'bg-red-50 border border-red-200'
             }`}
+            style={{
+              color: message.type === 'success' ? '#00C853' : '#f44336',
+            }}
           >
             {message.text}
           </div>
         )}
 
         {step === 'mobile' && (
-          <div className="flex flex-col gap-4">
-            <input
-              type="text"
-              placeholder="Mobile Number"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              className="text-gray-600 border-b bg-transparent focus:outline-none focus:border-indigo-600 rounded-lg px-4 py-2"
-            />
+          <div className="flex flex-col gap-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mobile Number
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your mobile number"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                className="w-full text-gray-800 border-2 border-gray-200 focus:border-blue-500 bg-white focus:outline-none rounded-lg px-4 py-3 transition-all"
+                style={{ borderColor: mobile ? '#1976D2' : undefined }}
+              />
+            </div>
             <button
               onClick={handleSendOtp}
-              className="bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition active:text-red-200"
+              className="w-full text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
+              style={{ backgroundColor: '#1976D2' }}
             >
               Send OTP
             </button>
@@ -206,59 +247,103 @@ export default function HomePage() {
         )}
 
         {step === 'otp' && (
-          <div className="flex flex-col gap-4">
-            <h4 className="bg-red-400">{myOtp}</h4>
-            <input
-              type="text"
-              pattern="\d{10}"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
+          <div className="flex flex-col gap-5">
+            {myOtp && (
+              <div
+                className="p-4 rounded-lg text-sm font-mono text-gray-700 border-2"
+                style={{ backgroundColor: '#F5F7FA', borderColor: '#c2c0b6' }}
+              >
+                {myOtp}
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Enter OTP
+              </label>
+              <input
+                type="text"
+                pattern="\d{10}"
+                placeholder="6-digit OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="w-full text-gray-800 border-2 border-gray-200 focus:border-blue-500 bg-white focus:outline-none rounded-lg px-4 py-3 transition-all text-center text-xl tracking-widest font-semibold"
+                maxLength={6}
+                style={{ borderColor: otp ? '#1976D2' : undefined }}
+              />
+            </div>
             <button
               onClick={handleVerifyOtp}
               disabled={!otp}
-              className={`py-2 rounded-lg transition ${otp ? 'bg-indigo-500 hover:bg-red-200 text-white' : 'bg-gray-400 cursor-not-allowed text-white'}`}
+              className={`w-full py-3 rounded-lg font-semibold transition-all transform shadow-md ${
+                otp
+                  ? 'hover:scale-[1.02] active:scale-[0.98] text-white hover:shadow-lg'
+                  : 'cursor-not-allowed opacity-50 text-white'
+              }`}
+              style={{ backgroundColor: otp ? '#1976D2' : '#c2c0b6' }}
             >
               Verify OTP
             </button>
             <button
               onClick={handleResendOtp}
               disabled={isButtonDisabled}
-              className="bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+              className={`w-full py-3 rounded-lg font-semibold transition-all transform shadow-md ${
+                !isButtonDisabled
+                  ? 'hover:scale-[1.02] active:scale-[0.98] text-white hover:shadow-lg'
+                  : 'cursor-not-allowed opacity-70 text-white'
+              }`}
+              style={{ backgroundColor: '#00C853' }}
             >
               {isButtonDisabled
-                ? `Re-Send in ${formatTime(timeLeft)}`
-                : 'rensend OTP'}
+                ? `Resend in ${formatTime(timeLeft)}`
+                : 'Resend OTP'}
             </button>
           </div>
         )}
 
         {step === 'details' && (
-          <div className="flex flex-col gap-4">
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-            <input
-              type="text"
-              placeholder="Bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
+          <div className="flex flex-col gap-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full text-gray-800 border-2 border-gray-200 focus:border-blue-500 bg-white focus:outline-none rounded-lg px-4 py-3 transition-all"
+                style={{ borderColor: name ? '#1976D2' : undefined }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Bio (Optional)
+              </label>
+              <textarea
+                placeholder="Tell us about yourself"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                className="w-full text-gray-800 border-2 border-gray-200 focus:border-blue-500 bg-white focus:outline-none rounded-lg px-4 py-3 transition-all resize-none"
+                rows={3}
+                style={{ borderColor: bio ? '#1976D2' : undefined }}
+              />
+            </div>
             <button
               onClick={handleRegister}
-              className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+              className="w-full text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
+              style={{ backgroundColor: '#1976D2' }}
             >
               Register & Login
             </button>
           </div>
         )}
+
+        {/* Footer */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-800">
+            By continuing, you agree to our Terms & Privacy Policy
+          </p>
+        </div>
       </div>
     </div>
   );

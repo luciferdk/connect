@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import axiosInstance from '../utils/axiosConfig';
 import Image from 'next/image';
 import FloatOption from './FloatOption';
+import { useRouter } from 'next/navigation';
 
 //---------- Interfaces ------------
 interface Contact {
@@ -46,6 +47,8 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
   const [imageErrorMap, setImageErrorMap] = useState<{ [id: string]: boolean }>(
     {},
   );
+
+  const router = useRouter();
 
   const API_ENDPOINT = '/api/messages/users';
 
@@ -117,7 +120,7 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
   return (
     <div className="h-screen-dvh sm:w-[19rem] w-[20rem] h-full bg-gray-800 text-white flex flex-col">
       {/* User Profile */}
-      <div className="pl-[80px] pt-4 pb-4 pr-4 md:p-4 border-b border-gray-700 flex items-center space-x-4">
+      <div className="pl-[65px] text-center pt-4 pb-4 pr-4 md:pt-4 md:pb-4 md:pr-4 md:pl-8 border-b border-gray-700 flex items-center gap-6">
         <Image
           src={userImgSrc}
           alt={data?.user?.name ?? 'User Profile'}
@@ -131,24 +134,30 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
           }
         />
 
-        <div className="relative">
+        <div className="flex flex-col gap-2">
           <h2 className="text-lg font-bold truncate">{data?.user.name}</h2>
-
           <button
             onClick={toggleMenu}
-            className="text-sm text-blue-400 hover:bg-gray-600 active:bg-gray-600 bg-gray-700 rounded-full p-2"
+            className="text-sm text-blue-400 hover:bg-gray-600 active:bg-gray-600 bg-gray-700 rounded-full px-4 py-2 self-start"
           >
             My Profile
           </button>
         </div>
       </div>
-
+      {menuOpen && <FloatOption />}
       {/* Contacts */}
       <div className="flex-1 overflow-y-auto p-2">
-        {menuOpen && <FloatOption />}
-        <button className="block item-center p-2 text-sm hover:bg-sky-400 active:bg-sky-400 rounded-full bg-gray-700 m-2">
-          Create group
-        </button>
+        <div className="flex flex-row-reverse justify-center mb-2">
+          <button
+            onClick={() => router.push('/SaveContact')}
+            className="block item-center p-2 text-sm hover:bg-sky-400 active:bg-sky-400 rounded-full bg-gray-700 m-2"
+          >
+            + Add Contact
+          </button>
+          <button className="block item-center p-2 text-sm hover:bg-sky-400 active:bg-sky-400 rounded-full bg-gray-700 m-2">
+            Create group
+          </button>
+        </div>
         <ul className="space-y-2">
           {data?.contacts?.length ? (
             data.contacts.map((contact) => {
@@ -161,7 +170,7 @@ export default function UserSideBar({ onSelect }: SideBarProps) {
                 <li
                   key={contact.id}
                   onClick={() => handleSelectedContact(contact)}
-                  className="flex items-center space-x-3 p-2 border-b hover:bg-gray-700 rounded-xl transition cursor-pointer"
+                  className="flex items-center pl-5 space-x-3 p-2 border-b hover:bg-gray-700 rounded-xl transition cursor-pointer"
                 >
                   <Image
                     src={imgSrc}
