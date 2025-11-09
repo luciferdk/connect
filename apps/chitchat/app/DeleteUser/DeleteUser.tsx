@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 import axios from 'axios';
 import axiosInstance from '../utils/axiosConfig';
@@ -21,8 +23,11 @@ export default function DeleteUser() {
     try {
       const deleteResponse = await axiosInstance.post(API_ENDPOINT);
       if (deleteResponse.status === 204) {
+      localStorage.removeItem('token');
+
         setMessage({ text: 'User deleted Successfully', type: 'success' });
-        setTimeout(() => router.push('/HomePage'), 1000);
+
+        setTimeout(() => router.push('/HomePage'), 500);
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
