@@ -163,188 +163,209 @@ export default function HomePage() {
       });
     }
   };
+return (
+  <div
+    className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+    style={{
+      background: 'linear-gradient(135deg, #F5F7FA 0%, #1f2937 100%)',
+    }}
+  >
+    {/* Decorative circles */}
+    <div className="absolute top-10 left-10 w-64 h-64 rounded-full opacity-10" style={{ backgroundColor: '#1976D2' }}></div>
+    <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full opacity-10" style={{ backgroundColor: '#00C853' }}></div>
+    
+    <div className="bg-[#f0f8ff] shadow-2xl rounded-3xl w-full max-w-md p-10 border-2 relative z-10" style={{ borderColor: '#F5F7FA' }}>
+      {/* Header Section */}
+      <div className="text-center mb-10">
+        <div
+          className="w-24 h-24 mx-auto mb-5 rounded-full flex items-center justify-center shadow-xl "
+         
+        >
+          <Image
+            src="/logo.svg"
+            alt="Connect company logo"
+            height={95}
+            width={95}
+            className="rounded-full"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        </div>
+        <h1 className="text-4xl font-bold mb-3" style={{ color: '#1f2937' }}>
+          {step === 'mobile'
+            ? "Let's Connect"
+            : step === 'otp'
+              ? 'Verify OTP'
+              : 'Complete Profile'}
+        </h1>
+        <p className="text-base font-medium" style={{ color: '#1f2937', opacity: 0.6 }}>
+          {step === 'mobile'
+            ? 'Enter your mobile number to continue'
+            : step === 'otp'
+              ? 'Enter the OTP sent to your mobile'
+              : 'Just a few more details'}
+        </p>
+      </div>
 
-  return (
-    <div
-      className="h-screen-dvh flex items-center justify-center p-4"
-      style={{
-        background: 'linear-gradient(135deg, #F5F7FA 0%, #c2c0b6 100%)',
-      }}
-    >
-      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md p-8 border border-gray-100">
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <div
-            className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: '#1976D2' }}
-          >
-            <Image
-              src="/logo.svg"
-              alt="Connect company logo"
-              height={65}
-              width={65}
-              className="rounded-full "
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
+      {/* Message Display */}
+      {message && (
+        <div
+          className={`mb-6 p-4 rounded-xl text-sm font-semibold text-center shadow-sm ${
+            message.type === 'success'
+              ? 'border-2'
+              : 'border-2'
+          }`}
+          style={{
+            backgroundColor: message.type === 'success' ? '#F5F7FA' : '#fee',
+            borderColor: message.type === 'success' ? '#00C853' : '#f44336',
+            color: message.type === 'success' ? '#00C853' : '#f44336',
+          }}
+        >
+          {message.text}
+        </div>
+      )}
+
+      {step === 'mobile' && (
+        <div className="flex flex-col gap-6">
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: '#1f2937' }}>
+              Mobile Number
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your mobile number"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              className="w-full border-2 bg-white focus:outline-none rounded-xl px-5 py-4 transition-all font-medium text-base shadow-sm"
+              style={{ 
+                borderColor: mobile ? '#1976D2' : '#F5F7FA',
+                color: '#1f2937'
               }}
             />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            {step === 'mobile'
-              ? 'Welcome Back'
-              : step === 'otp'
-                ? 'Verify OTP'
-                : 'Complete Profile'}
-          </h1>
-          <p className="text-gray-500 text-sm">
-            {step === 'mobile'
-              ? 'Enter your mobile number to continue'
-              : step === 'otp'
-                ? 'Enter the OTP sent to your mobile'
-                : 'Just a few more details'}
-          </p>
-        </div>
-
-        {/* Message Display */}
-        {message && (
-          <div
-            className={`mb-6 p-4 rounded-lg text-sm font-medium text-center ${
-              message.type === 'success'
-                ? 'bg-green-50 border border-green-200'
-                : 'bg-red-50 border border-red-200'
-            }`}
-            style={{
-              color: message.type === 'success' ? '#00C853' : '#f44336',
-            }}
+          <button
+            onClick={handleSendOtp}
+            className="w-full text-white py-4 rounded-xl font-bold transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl text-base"
+            style={{ backgroundColor: '#1976D2' }}
           >
-            {message.text}
-          </div>
-        )}
-
-        {step === 'mobile' && (
-          <div className="flex flex-col gap-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Mobile Number
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your mobile number"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
-                className="w-full text-gray-800 border-2 border-gray-200 focus:border-blue-500 bg-white focus:outline-none rounded-lg px-4 py-3 transition-all"
-                style={{ borderColor: mobile ? '#1976D2' : undefined }}
-              />
-            </div>
-            <button
-              onClick={handleSendOtp}
-              className="w-full text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
-              style={{ backgroundColor: '#1976D2' }}
-            >
-              Send OTP
-            </button>
-          </div>
-        )}
-
-        {step === 'otp' && (
-          <div className="flex flex-col gap-5">
-            {myOtp && (
-              <div
-                className="p-4 rounded-lg text-sm font-mono text-gray-700 border-2"
-                style={{ backgroundColor: '#F5F7FA', borderColor: '#c2c0b6' }}
-              >
-                {myOtp}
-              </div>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Enter OTP
-              </label>
-              <input
-                type="text"
-                pattern="\d{10}"
-                placeholder="6-digit OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                className="w-full text-gray-800 border-2 border-gray-200 focus:border-blue-500 bg-white focus:outline-none rounded-lg px-4 py-3 transition-all text-center text-xl tracking-widest font-semibold"
-                maxLength={6}
-                style={{ borderColor: otp ? '#1976D2' : undefined }}
-              />
-            </div>
-            <button
-              onClick={handleVerifyOtp}
-              disabled={!otp}
-              className={`w-full py-3 rounded-lg font-semibold transition-all transform shadow-md ${
-                otp
-                  ? 'hover:scale-[1.02] active:scale-[0.98] text-white hover:shadow-lg'
-                  : 'cursor-not-allowed opacity-50 text-white'
-              }`}
-              style={{ backgroundColor: otp ? '#1976D2' : '#c2c0b6' }}
-            >
-              Verify OTP
-            </button>
-            <button
-              onClick={handleResendOtp}
-              disabled={isButtonDisabled}
-              className={`w-full py-3 rounded-lg font-semibold transition-all transform shadow-md ${
-                !isButtonDisabled
-                  ? 'hover:scale-[1.02] active:scale-[0.98] text-white hover:shadow-lg'
-                  : 'cursor-not-allowed opacity-70 text-white'
-              }`}
-              style={{ backgroundColor: '#00C853' }}
-            >
-              {isButtonDisabled
-                ? `Resend in ${formatTime(timeLeft)}`
-                : 'Resend OTP'}
-            </button>
-          </div>
-        )}
-
-        {step === 'details' && (
-          <div className="flex flex-col gap-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full text-gray-800 border-2 border-gray-200 focus:border-blue-500 bg-white focus:outline-none rounded-lg px-4 py-3 transition-all"
-                style={{ borderColor: name ? '#1976D2' : undefined }}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bio (Optional)
-              </label>
-              <textarea
-                placeholder="Tell us about yourself"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                className="w-full text-gray-800 border-2 border-gray-200 focus:border-blue-500 bg-white focus:outline-none rounded-lg px-4 py-3 transition-all resize-none"
-                rows={3}
-                style={{ borderColor: bio ? '#1976D2' : undefined }}
-              />
-            </div>
-            <button
-              onClick={handleRegister}
-              className="w-full text-white py-3 rounded-lg font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg"
-              style={{ backgroundColor: '#1976D2' }}
-            >
-              Register & Login
-            </button>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-800">
-            By continuing, you agree to our Terms & Privacy Policy
-          </p>
+            Send OTP
+          </button>
         </div>
+      )}
+
+      {step === 'otp' && (
+        <div className="flex flex-col gap-6">
+          {myOtp && (
+            <div
+              className="p-5 rounded-xl text-sm font-mono border-2 shadow-sm"
+              style={{ 
+                backgroundColor: '#F5F7FA', 
+                borderColor: '#1976D2',
+                color: '#1f2937'
+              }}
+            >
+              {myOtp}
+            </div>
+          )}
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: '#1f2937' }}>
+              Enter OTP
+            </label>
+            <input
+              type="text"
+              pattern="\d{10}"
+              placeholder="6-digit OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              className="w-full border-2 bg-white focus:outline-none rounded-xl px-5 py-4 transition-all text-center text-2xl tracking-widest font-bold shadow-sm"
+              maxLength={6}
+              style={{ 
+                borderColor: otp ? '#1976D2' : '#F5F7FA',
+                color: '#1f2937'
+              }}
+            />
+          </div>
+          <button
+            onClick={handleVerifyOtp}
+            disabled={!otp}
+            className={`w-full py-4 rounded-xl font-bold transition-all transform shadow-lg text-base ${
+              otp
+                ? 'hover:scale-[1.02] active:scale-[0.98] text-white hover:shadow-xl'
+                : 'cursor-not-allowed opacity-50 text-white'
+            }`}
+            style={{ backgroundColor: otp ? '#1976D2' : '#c2c0b6' }}
+          >
+            Verify OTP
+          </button>
+          <button
+            onClick={handleResendOtp}
+            disabled={isButtonDisabled}
+            className={`w-full py-4 rounded-xl font-bold transition-all transform shadow-lg text-base ${
+              !isButtonDisabled
+                ? 'hover:scale-[1.02] active:scale-[0.98] text-white hover:shadow-xl'
+                : 'cursor-not-allowed opacity-70 text-white'
+            }`}
+            style={{ backgroundColor: '#00C853' }}
+          >
+            {isButtonDisabled
+              ? `Resend in ${formatTime(timeLeft)}`
+              : 'Resend OTP'}
+          </button>
+        </div>
+      )}
+
+      {step === 'details' && (
+        <div className="flex flex-col gap-6">
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: '#1f2937' }}>
+              Full Name *
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border-2 bg-white focus:outline-none rounded-xl px-5 py-4 transition-all font-medium text-base shadow-sm"
+              style={{ 
+                borderColor: name ? '#1976D2' : '#F5F7FA',
+                color: '#1f2937'
+              }}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: '#1f2937' }}>
+              Bio (Optional)
+            </label>
+            <textarea
+              placeholder="Tell us about yourself"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              className="w-full border-2 bg-white focus:outline-none rounded-xl px-5 py-4 transition-all resize-none font-medium shadow-sm"
+              rows={3}
+              style={{ 
+                borderColor: bio ? '#1976D2' : '#F5F7FA',
+                color: '#1f2937'
+              }}
+            />
+          </div>
+          <button
+            onClick={handleRegister}
+            className="w-full text-white py-4 rounded-xl font-bold transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl text-base"
+            style={{ backgroundColor: '#1976D2' }}
+          >
+            Register & Login
+          </button>
+        </div>
+      )}
+
+      {/* Footer */}
+      <div className="mt-8 text-center">
+        <p className="text-xs font-medium" style={{ color: '#1f2937', opacity: 0.6 }}>
+          By continuing, you agree to our Terms & Privacy Policy
+        </p>
       </div>
     </div>
-  );
-}
+  </div>
+);
+  }
